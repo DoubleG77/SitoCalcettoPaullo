@@ -32,6 +32,8 @@ export default function NuovaPartita() {
   const [goalsB, setGoalsB] = useState({})
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [playerSearch, setPlayerSearch] = useState("")
+  const [saveError, setSaveError] = useState("")
 
   useEffect(() => {
     supabase.from("players").select("*").order("name").then(({ data }) => {
@@ -63,6 +65,7 @@ export default function NuovaPartita() {
 
   const handleSave = async () => {
     setSaving(true)
+    setSaveError("")
     try {
       const { data: match, error } = await supabase
         .from("matches")
@@ -76,25 +79,40 @@ export default function NuovaPartita() {
         .select().maybeSingle()
       if (error) throw error
 
-      await supabase.from("match_players").insert([
+      const { error: playersError } = await supabase.from("match_players").insert([
         ...teamA.map(p => ({ match_id: match.id, player_id: p.id, team: "A" })),
         ...teamB.map(p => ({ match_id: match.id, player_id: p.id, team: "B" })),
       ])
+      if (playersError) throw playersError
 
       const goalRows = [
         ...Object.entries(goalsA).filter(([, v]) => v > 0).map(([id, count]) => ({ match_id: match.id, player_id: id, count })),
         ...Object.entries(goalsB).filter(([, v]) => v > 0).map(([id, count]) => ({ match_id: match.id, player_id: id, count })),
       ]
-      if (goalRows.length > 0) await supabase.from("goals").insert(goalRows)
+      if (goalRows.length > 0) {
+        const { error: goalsError } = await supabase.from("goals").insert(goalRows)
+        if (goalsError) throw goalsError
+      }
 
       setSuccess(true)
       setTeamA([]); setTeamB([]); setNameA(""); setNameB("")
       setScoreA(0); setScoreB(0); setGoalsA({}); setGoalsB({})
     } catch (e) {
-      alert("Errore: " + e.message)
+      setSaveError(`Errore nel salvataggio: ${e.message}`)
     }
     setSaving(false)
   }
+
+  const clearTeams = () => {
+    setTeamA([])
+    setTeamB([])
+    setGoalsA({})
+    setGoalsB({})
+  }
+
+  const visiblePlayers = players.filter(p =>
+    p.name.toLowerCase().includes(playerSearch.trim().toLowerCase())
+  )
 
   if (success) return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, paddingTop: 60, textAlign: "center" }}>
@@ -112,12 +130,33 @@ export default function NuovaPartita() {
 
       {/* Giocatori */}
       <Card>
-        <Label>GIOCATORI <span style={{ color: C.accent }}>— tocca per assegnare</span></Label>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+          <Label>GIOCATORI <span style={{ color: C.accent }}>— tocca per assegnare</span></Label>
+          {(teamA.length > 0 || teamB.length > 0) && (
+            <button onClick={clearTeams} style={{
+              background: "transparent", border: "none", color: C.muted,
+              padding: 0, fontSize: 11, cursor: "pointer", whiteSpace: "nowrap",
+            }}>Svuota</button>
+          )}
+        </div>
         {players.length === 0 && (
           <div style={{ color: C.muted, fontSize: 13, fontStyle: "italic" }}>Nessun giocatore nel database</div>
         )}
+        {players.length > 0 && (
+          <input
+            value={playerSearch}
+            onChange={e => setPlayerSearch(e.target.value)}
+            placeholder="Cerca giocatore..."
+            aria-label="Cerca giocatore"
+            style={{
+              width: "100%", boxSizing: "border-box", background: C.surface,
+              color: C.text, border: `1px solid ${C.border}`, borderRadius: 8,
+              padding: "9px 11px", fontSize: 13, outline: "none", marginBottom: 12,
+            }}
+          />
+        )}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
-          {players.map(p => {
+          {visiblePlayers.map(p => {
             const inA = teamA.find(x => x.id === p.id)
             const inB = teamB.find(x => x.id === p.id)
             return (
@@ -130,6 +169,9 @@ export default function NuovaPartita() {
               }}>{p.name}</button>
             )
           })}
+          {players.length > 0 && visiblePlayers.length === 0 && (
+            <div style={{ color: C.muted, fontSize: 13, fontStyle: "italic" }}>Nessun giocatore trovato</div>
+          )}
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -233,6 +275,12 @@ export default function NuovaPartita() {
       )}
 
       {/* Salva */}
+      {saveError && (
+        <div role="alert" style={{
+          background: C.red + "15", border: `1px solid ${C.red}40`,
+          borderRadius: 10, color: C.red, padding: "11px 13px", fontSize: 13,
+        }}>{saveError}</div>
+      )}
       <button onClick={handleSave} disabled={!canSave || saving} style={{
         background: canSave ? C.accent : C.border,
         color: canSave ? C.bg : C.muted,

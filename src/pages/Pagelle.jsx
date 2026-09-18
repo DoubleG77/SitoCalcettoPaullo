@@ -165,6 +165,7 @@ export default function Pagelle() {
   const [voterCount, setVoterCount] = useState(0)
   const [totalPlayers, setTotalPlayers] = useState(0)
   const [voteDeadline, setVoteDeadline] = useState(null)
+  const [saveError, setSaveError] = useState("")
 
   const countdown = useCountdown(voteDeadline)
 
@@ -251,7 +252,13 @@ export default function Pagelle() {
   }
 
   async function handleSave() {
+    if (isExpired) {
+      setSaveError("La votazione è scaduta")
+      return
+    }
+
     setSaving(true)
+    setSaveError("")
     // Controllo doppio voto
     const { data: existing } = await supabase
       .from("ratings")
@@ -260,6 +267,13 @@ export default function Pagelle() {
       .eq("voter_id", player.id)  // ← player.id
       .limit(1)
       .maybeSingle()
+
+    if (existing) {
+      setHasVoted(true)
+      setSaving(false)
+      setPhase("intro")
+      return
+    }
 
     // Insert rows
     const rows = [
@@ -282,9 +296,10 @@ export default function Pagelle() {
     const { error } = await supabase.from("ratings").insert(rows)
     if (error) {
       if (error.code === "23505") {
-        alert("Hai già votato per questa partita!")
+        setHasVoted(true)
+        setSaveError("Hai già votato per questa partita")
       } else {
-        alert("Errore: " + error.message)
+        setSaveError(`Errore nel salvataggio: ${error.message}`)
       }
       setSaving(false)
       return
@@ -452,6 +467,13 @@ export default function Pagelle() {
         borderRadius: 10, padding: "14px", fontWeight: 900,
         fontSize: 15, cursor: "pointer", opacity: saving ? 0.6 : 1,
       }}>{saving ? "SALVATAGGIO..." : "SALVA PAGELLE ✓"}</button>
+      {saveError && (
+        <div role="alert" style={{
+          background: C.red + "15", border: `1px solid ${C.red}40`,
+          borderRadius: 10, color: C.red, padding: "11px 13px", fontSize: 13,
+          textAlign: "center",
+        }}>{saveError}</div>
+      )}
       <button onClick={() => setPhase("rankA")} style={{
         background: "transparent", color: C.muted,
         border: `1px solid ${C.border}`, borderRadius: 8,

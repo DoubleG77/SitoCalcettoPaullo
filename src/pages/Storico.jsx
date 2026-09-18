@@ -48,6 +48,8 @@ export default function Storico() {
   const [expanded, setExpanded] = useState(null)
   const [details, setDetails] = useState({})
   const [loading, setLoading] = useState(true)
+  const [detailLoading, setDetailLoading] = useState(null)
+  const [search, setSearch] = useState("")
 
   useEffect(() => { loadMatches() }, [])
 
@@ -64,6 +66,8 @@ export default function Storico() {
 
   async function loadDetail(matchId) {
   if (details[matchId]) { setExpanded(expanded === matchId ? null : matchId); return }
+
+  setDetailLoading(matchId)
 
   const { data: mp } = await supabase
     .from("match_players")
@@ -102,6 +106,7 @@ export default function Storico() {
 
   setDetails(d => ({ ...d, [matchId]: { playersA, playersB, goals: goals || [], hasVotes } }))
   setExpanded(matchId)
+  setDetailLoading(null)
   }
 
   if (loading) return <div style={{ color: "#6b6b8a", textAlign: "center", padding: 60 }}>Caricamento...</div>
@@ -113,13 +118,33 @@ export default function Storico() {
     </div>
   )
 
+  const filteredMatches = matches.filter(match => {
+    const query = search.trim().toLowerCase()
+    if (!query) return true
+    return match.team_a_name.toLowerCase().includes(query)
+      || match.team_b_name.toLowerCase().includes(query)
+      || new Date(match.created_at).toLocaleDateString("it-IT").includes(query)
+  })
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div style={{ color: C.muted, fontSize: 11, letterSpacing: 2 }}>
-        STORICO · {matches.length} PARTITE
+        STORICO · {filteredMatches.length} DI {matches.length} PARTITE
       </div>
 
-      {matches.map(match => {
+      <input
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        placeholder="Cerca squadra o data..."
+        aria-label="Cerca nello storico"
+        style={{
+          width: "100%", boxSizing: "border-box", background: C.surface,
+          color: C.text, border: `1px solid ${C.border}`, borderRadius: 8,
+          padding: "10px 12px", fontSize: 13, outline: "none",
+        }}
+      />
+
+      {filteredMatches.map(match => {
         const isExpanded = expanded === match.id
         const result = match.score_a > match.score_b ? "A" : match.score_a < match.score_b ? "B" : "X"
         const resultLabel = result === "A" ? `Vince ${match.team_a_name}` : result === "B" ? `Vince ${match.team_b_name}` : "Pareggio"
@@ -160,7 +185,12 @@ export default function Storico() {
             </div>
 
             {/* Dettaglio espanso */}
-            {isExpanded && detail && (
+            {isExpanded && detailLoading === match.id && (
+              <div style={{ borderTop: `1px solid ${C.border}`, padding: 18, background: C.surface, color: C.muted, textAlign: "center", fontSize: 13 }}>
+                Caricamento dettagli...
+              </div>
+            )}
+            {isExpanded && detail && detailLoading !== match.id && (
               <div style={{ borderTop: `1px solid ${C.border}`, padding: "14px 18px", background: C.surface }}>
                 {/* Giocatori */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
@@ -211,6 +241,12 @@ export default function Storico() {
           </div>
         )
       })}
+
+      {filteredMatches.length === 0 && (
+        <div style={{ color: C.muted, textAlign: "center", padding: 28, fontSize: 13 }}>
+          Nessuna partita trovata
+        </div>
+      )}
     </div>
   )
 }

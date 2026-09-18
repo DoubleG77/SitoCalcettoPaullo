@@ -21,16 +21,16 @@ const NAV = [
   { id: "nuova", label: "Nuova", icon: "➕" },
 ]
 
-function HeaderAvatar({ player, onSignOut }) {
+function HeaderAvatar({ player, onClick }) {
   const avatarUrl = useSignedUrl(player?.avatar_url)
   return (
-    <button onClick={onSignOut} style={{
+    <button onClick={onClick} aria-label="Apri menu profilo" title="Menu profilo" style={{
       width: 38, height: 38, borderRadius: "50%",
       background: "#00e67620", border: "2px solid #00e67640",
       overflow: "hidden", cursor: "pointer", padding: 0,
     }}>
       {avatarUrl
-        ? <img src={avatarUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        ? <img src={avatarUrl} alt="Avatar del profilo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         : <span style={{ color: "#00e676", fontWeight: 900, fontSize: 15 }}>
             {player?.name?.[0]?.toUpperCase()}
           </span>
@@ -41,6 +41,7 @@ function HeaderAvatar({ player, onSignOut }) {
 
 export default function App() {
   const [page, setPage] = useState("home")
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const { user, player, loading, signOut, refreshPlayer } = useAuth()
 
   if (loading) return (
@@ -78,7 +79,33 @@ export default function App() {
           <div style={{ color: "#00e676", fontSize: 11, letterSpacing: 3, fontWeight: 700 }}>IL CALCETTO</div>
           <div style={{ color: "#f0f0f0", fontSize: 17, fontWeight: 900 }}>{current?.icon} {current?.label}</div>
         </div>
-        <HeaderAvatar player={player} onSignOut={signOut} />
+        <div style={{ position: "relative" }}>
+          <HeaderAvatar
+            player={player}
+            onClick={() => setProfileMenuOpen(open => !open)}
+          />
+          {profileMenuOpen && (
+            <div style={{
+              position: "absolute", top: 46, right: 0, width: 150,
+              background: "#1a1a24", border: "1px solid #2a2a3a",
+              borderRadius: 10, padding: 6, boxShadow: "0 8px 24px #00000050",
+              zIndex: 30,
+            }}>
+              <button onClick={() => { setPage("profilo"); setProfileMenuOpen(false) }} style={{
+                width: "100%", background: "transparent", border: "none",
+                color: "#f0f0f0", padding: "10px 12px", textAlign: "left",
+                borderRadius: 6, cursor: "pointer", fontSize: 13,
+              }}>Profilo</button>
+              <button onClick={() => {
+                if (window.confirm("Vuoi uscire dall'app?")) signOut()
+              }} style={{
+                width: "100%", background: "transparent", border: "none",
+                color: "#ff7777", padding: "10px 12px", textAlign: "left",
+                borderRadius: 6, cursor: "pointer", fontSize: 13,
+              }}>Esci</button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Content */}
@@ -94,7 +121,8 @@ export default function App() {
         display: "grid", gridTemplateColumns: "repeat(7, 1fr)", zIndex: 20,
       }}>
         {NAV.map(item => (
-          <button key={item.id} onClick={() => setPage(item.id)} style={{
+          <button key={item.id} onClick={() => setPage(item.id)} aria-label={item.label}
+            aria-current={page === item.id ? "page" : undefined} style={{
             background: "transparent", border: "none",
             padding: "10px 4px 12px",
             display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
