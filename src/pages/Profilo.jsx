@@ -54,6 +54,10 @@ export default function Profilo() {
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [editingName, setEditingName] = useState(false)
+  const [nameDraft, setNameDraft] = useState("")
+  const [savingName, setSavingName] = useState(false)
+  const [nameError, setNameError] = useState("")
   const { refreshPlayer } = useAuth()
 
   const onCropComplete = useCallback((_, pixels) => { setCroppedAreaPixels(pixels) }, [])
@@ -78,6 +82,34 @@ export default function Profilo() {
     setImageSrc(null)
     setUploadingPhoto(false)
     loadProfile({ ...currentPlayer, avatar_url: path })
+  }
+
+  const handleSaveName = async () => {
+    const name = nameDraft.trim()
+    if (!name) {
+      setNameError("Inserisci un nome")
+      return
+    }
+
+    setSavingName(true)
+    setNameError("")
+    const { error } = await supabase
+      .from("players")
+      .update({ name })
+      .eq("id", currentPlayer.id)
+
+    if (error) {
+      setNameError("Impossibile salvare il nome")
+      setSavingName(false)
+      return
+    }
+
+    const updatedPlayer = { ...currentPlayer, name }
+    setPlayers(prev => prev.map(player => player.id === updatedPlayer.id ? updatedPlayer : player))
+    setSelected(prev => prev?.id === updatedPlayer.id ? updatedPlayer : prev)
+    await refreshPlayer()
+    setEditingName(false)
+    setSavingName(false)
   }
 
   useEffect(() => {
@@ -296,7 +328,51 @@ export default function Profilo() {
                 </>
               )}
             </div>
-            <div style={{ color: C.text, fontSize: 22, fontWeight: 900 }}>{selected?.name}</div>
+            {editingName && selected?.id === currentPlayer?.id ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 280, margin: "0 auto" }}>
+                <input
+                  value={nameDraft}
+                  onChange={e => { setNameDraft(e.target.value); setNameError("") }}
+                  onKeyDown={e => { if (e.key === "Enter") handleSaveName() }}
+                  autoFocus
+                  maxLength={40}
+                  aria-label="Nome del profilo"
+                  style={{
+                    width: "100%", boxSizing: "border-box", background: C.surface,
+                    color: C.text, border: `1px solid ${nameError ? C.red : C.accent}`,
+                    borderRadius: 8, padding: "10px 12px", fontSize: 18,
+                    fontWeight: 700, textAlign: "center", outline: "none",
+                  }}
+                />
+                {nameError && <div style={{ color: C.red, fontSize: 12 }}>{nameError}</div>}
+                <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+                  <button onClick={() => { setEditingName(false); setNameError("") }} disabled={savingName} style={{
+                    background: "transparent", color: C.muted, border: `1px solid ${C.border}`,
+                    borderRadius: 8, padding: "7px 12px", fontSize: 12, cursor: "pointer",
+                  }}>Annulla</button>
+                  <button onClick={handleSaveName} disabled={savingName} style={{
+                    background: C.accent, color: C.card, border: "none",
+                    borderRadius: 8, padding: "7px 12px", fontSize: 12, fontWeight: 800,
+                    cursor: "pointer", opacity: savingName ? 0.6 : 1,
+                  }}>{savingName ? "Salvataggio..." : "Salva"}</button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <div style={{ color: C.text, fontSize: 22, fontWeight: 900 }}>{selected?.name}</div>
+                {selected?.id === currentPlayer?.id && (
+                  <button
+                    onClick={() => { setNameDraft(selected.name); setNameError(""); setEditingName(true) }}
+                    aria-label="Modifica nome profilo"
+                    title="Modifica nome"
+                    style={{
+                      background: "transparent", border: "none", color: C.muted,
+                      cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 4,
+                    }}
+                  >✎</button>
+                )}
+              </div>
+            )}
             {selected?.id === currentPlayer?.id && (
               <div style={{ color: C.accent, fontSize: 12, marginTop: 4 }}>Il tuo profilo</div>
             )}
