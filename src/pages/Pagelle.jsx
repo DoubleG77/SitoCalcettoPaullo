@@ -1,6 +1,7 @@
 import { supabase } from "../supabaseClient"
 import { useAuth } from "../AuthContext"
 import { useState, useEffect, useRef } from "react"
+import { formatMatchDate } from "../matchDate"
 
 const C = {
   card: "#1a1a24", border: "#2a2a3a", accent: "#00e676",
@@ -321,7 +322,7 @@ export default function Pagelle() {
     </div>
   )
 
-  const date = new Date(lastMatch.created_at).toLocaleDateString("it-IT", { day: "numeric", month: "long" })
+  const date = formatMatchDate(lastMatch, { day: "numeric", month: "long" })
   const isExpired = voteDeadline && new Date() > new Date(voteDeadline)
 
   // Card partecipazione

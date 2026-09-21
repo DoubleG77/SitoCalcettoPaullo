@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient"
 import { useAuth } from "../AuthContext"
 import { useSignedUrl } from "../hooks/useSignedUrl"
 import Cropper from "react-easy-crop"
+import { formatMatchDate } from "../matchDate"
 
 async function getCroppedImg(imageSrc, croppedAreaPixels) {
   const image = await new Promise((resolve, reject) => {
@@ -177,7 +178,7 @@ export default function Profilo() {
       totalGoals += gol
       return {
         id: match.id,
-        date: new Date(match.created_at).toLocaleDateString("it-IT", { day: "numeric", month: "short" }),
+        date: formatMatchDate(match, { day: "numeric", month: "short" }),
         result, goals: gol,
         teamName: team === "A" ? match.team_a_name : match.team_b_name,
         vs: team === "A" ? match.team_b_name : match.team_a_name,

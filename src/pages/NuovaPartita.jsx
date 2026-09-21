@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 import { useAuth } from "../AuthContext"
+import { getTodayDateInput } from "../matchDate"
 
 const C = {
   bg: "#0a0a0f", surface: "#13131a", card: "#1a1a24",
@@ -34,6 +35,7 @@ export default function NuovaPartita() {
   const [success, setSuccess] = useState(false)
   const [playerSearch, setPlayerSearch] = useState("")
   const [saveError, setSaveError] = useState("")
+  const [matchDate, setMatchDate] = useState(getTodayDateInput())
 
   useEffect(() => {
     supabase.from("players").select("*").order("name").then(({ data }) => {
@@ -74,6 +76,7 @@ export default function NuovaPartita() {
           team_b_name: nameB || "Squadra B",
           score_a: scoreA,
           score_b: scoreB,
+          date: matchDate,
           created_by: player?.id,
         })
         .select().maybeSingle()
@@ -97,6 +100,7 @@ export default function NuovaPartita() {
       setSuccess(true)
       setTeamA([]); setTeamB([]); setNameA(""); setNameB("")
       setScoreA(0); setScoreB(0); setGoalsA({}); setGoalsB({})
+      setMatchDate(getTodayDateInput())
     } catch (e) {
       setSaveError(`Errore nel salvataggio: ${e.message}`)
     }
@@ -127,6 +131,23 @@ export default function NuovaPartita() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+      {/* Data della partita */}
+      <Card>
+        <Label>DATA PARTITA</Label>
+        <input
+          type="date"
+          value={matchDate}
+          onChange={e => setMatchDate(e.target.value)}
+          required
+          aria-label="Data della partita"
+          style={{
+            width: "100%", boxSizing: "border-box", background: C.surface,
+            color: C.text, border: `1px solid ${C.border}`, borderRadius: 8,
+            padding: "10px 12px", fontSize: 14, outline: "none",
+          }}
+        />
+      </Card>
 
       {/* Giocatori */}
       <Card>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
+import { formatMatchDate } from "../matchDate"
 
 const C = {
   bg: "#07131b",
@@ -149,7 +150,7 @@ export default function Home({ onNavigate }) {
     ? `Vittoria ${match.team_b_name}` : "Pareggio"
   const resultColor = match.score_a !== match.score_b ? C.accent : C.muted
 
-  const date = new Date(match.created_at).toLocaleDateString("it-IT", {
+  const date = formatMatchDate(match, {
     weekday: "long", day: "numeric", month: "long"
   })
 

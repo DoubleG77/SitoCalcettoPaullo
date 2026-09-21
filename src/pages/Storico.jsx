@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
+import { formatMatchDate } from "../matchDate"
 
 const C = {
   card: "#1a1a24", border: "#2a2a3a", accent: "#00e676",
@@ -123,7 +124,7 @@ export default function Storico() {
     if (!query) return true
     return match.team_a_name.toLowerCase().includes(query)
       || match.team_b_name.toLowerCase().includes(query)
-      || new Date(match.created_at).toLocaleDateString("it-IT").includes(query)
+      || formatMatchDate(match).includes(query)
   })
 
   return (
@@ -149,7 +150,7 @@ export default function Storico() {
         const result = match.score_a > match.score_b ? "A" : match.score_a < match.score_b ? "B" : "X"
         const resultLabel = result === "A" ? `Vince ${match.team_a_name}` : result === "B" ? `Vince ${match.team_b_name}` : "Pareggio"
         const resultColor = result !== "X" ? C.accent : C.muted
-        const date = new Date(match.created_at).toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" })
+        const date = formatMatchDate(match, { day: "numeric", month: "short", year: "numeric" })
         const detail = details[match.id]
 
         return (
