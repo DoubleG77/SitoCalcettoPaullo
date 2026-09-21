@@ -15,8 +15,6 @@ export default function Marcatori() {
   const [scorers, setScorers] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => { loadScorers() }, [])
-
   async function loadScorers() {
     setLoading(true)
 
@@ -57,6 +55,8 @@ export default function Marcatori() {
     setScorers(sorted)
     setLoading(false)
   }
+
+  useEffect(() => { queueMicrotask(loadScorers) }, [])
 
   if (loading) return <div style={{ color: "#6b6b8a", textAlign: "center", padding: 60 }}>Caricamento...</div>
 

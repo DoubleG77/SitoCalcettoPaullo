@@ -40,8 +40,6 @@ export default function Classifica() {
   const [standings, setStandings] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => { loadStandings() }, [])
-
   async function loadStandings() {
     setLoading(true)
 
@@ -106,6 +104,8 @@ export default function Classifica() {
     setStandings(sorted)
     setLoading(false)
   }
+
+  useEffect(() => { queueMicrotask(loadStandings) }, [])
 
   if (loading) return (
     <div style={{

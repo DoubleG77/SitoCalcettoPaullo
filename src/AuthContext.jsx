@@ -1,17 +1,26 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { supabase } from "./supabaseClient"
-
-const AuthContext = createContext(null)
+import { AuthContext } from "./authContext"
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [player, setPlayer] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  async function loadPlayer(userId) {
+    const { data } = await supabase
+      .from("players")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle()
+    setPlayer(data || null)
+    setLoading(false)
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) loadPlayer(session.user.id)
+      if (session?.user) queueMicrotask(() => loadPlayer(session.user.id))
       else setLoading(false)
     })
 
@@ -23,16 +32,6 @@ export function AuthProvider({ children }) {
 
     return () => subscription.unsubscribe()
   }, [])
-
-  async function loadPlayer(userId) {
-    const { data } = await supabase
-      .from("players")
-      .select("*")
-      .eq("user_id", userId)
-      .maybeSingle()
-    setPlayer(data || null)
-    setLoading(false)
-  }
 
   const signInWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
@@ -56,5 +55,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   )
 }
-
-export const useAuth = () => useContext(AuthContext)

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useAuth } from "./AuthContext"
+import { useAuth } from "./authContext"
 import Login from "./pages/Login"
 import Home from "./pages/Home"
 import Classifica from "./pages/Classifica"

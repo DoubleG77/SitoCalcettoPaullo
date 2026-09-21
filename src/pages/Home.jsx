@@ -50,10 +50,6 @@ export default function Home({ onNavigate }) {
   const [mvpGoals, setMvpGoals] = useState(0)
   const [seasonStats, setSeasonStats] = useState({ matches: 0, goals: 0, avg: "0.0" })
 
-  useEffect(() => {
-    loadLastMatch()
-  }, [])
-
   async function loadLastMatch() {
     setLoading(true)
 
@@ -132,6 +128,10 @@ export default function Home({ onNavigate }) {
     })
     setLoading(false)
   }
+
+  useEffect(() => {
+    queueMicrotask(loadLastMatch)
+  }, [])
 
   if (loading) return (
     <div style={{ textAlign: "center", padding: 60, color: C.muted }}>Caricamento...</div>

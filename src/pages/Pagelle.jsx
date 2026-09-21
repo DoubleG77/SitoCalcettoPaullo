@@ -1,5 +1,5 @@
 import { supabase } from "../supabaseClient"
-import { useAuth } from "../AuthContext"
+import { useAuth } from "../authContext"
 import { useState, useEffect, useRef } from "react"
 import { formatMatchDate } from "../matchDate"
 
@@ -152,7 +152,7 @@ function DraggableList({ players, color, onReorder }) {
 }
 
 export default function Pagelle() {
-  const { user, player } = useAuth()
+  const { player } = useAuth()
   const [lastMatch, setLastMatch] = useState(null)
   const [playersA, setPlayersA] = useState([])
   const [playersB, setPlayersB] = useState([])
@@ -164,60 +164,10 @@ export default function Pagelle() {
   const [loading, setLoading] = useState(true)
   const [hasVoted, setHasVoted] = useState(false)
   const [voterCount, setVoterCount] = useState(0)
-  const [totalPlayers, setTotalPlayers] = useState(0)
   const [voteDeadline, setVoteDeadline] = useState(null)
   const [saveError, setSaveError] = useState("")
 
   const countdown = useCountdown(voteDeadline)
-
-  useEffect(() => { loadLastMatch() }, [])
-
-  async function loadLastMatch() {
-    setLoading(true)
-    const { data: match } = await supabase
-      .from("matches").select("*")
-      .order("created_at", { ascending: false })
-      .limit(1).maybeSingle()
-
-    if (!match) { setLoading(false); return }
-    setLastMatch(match)
-
-    // Deadline = 24h dopo la creazione della partita
-    const deadline = new Date(match.created_at)
-    deadline.setHours(deadline.getHours() + 24)
-    setVoteDeadline(deadline)
-
-    const { data: mp } = await supabase
-      .from("match_players")
-      .select("team, players(id, name)")
-      .eq("match_id", match.id)
-
-    if (mp) {
-      const pA = mp.filter(x => x.team === "A").map(x => x.players)
-      const pB = mp.filter(x => x.team === "B").map(x => x.players)
-      setPlayersA(pA)
-      setPlayersB(pB)
-      setRankingA(pA)
-      setRankingB(pB)
-      setTotalPlayers(pA.length + pB.length)
-    }
-
-    // Controlla se l'utente ha già votato
-    if (player) {
-      const { data: myVote } = await supabase
-        .from("ratings")
-        .select("id")
-        .eq("match_id", match.id)
-        .eq("voter_id", player.id)
-        .limit(1)
-        .maybeSingle()
-      setHasVoted(!!myVote)
-    }
-
-    await loadResults(match.id)
-    await loadVoterCount(match.id)
-    setLoading(false)
-  }
 
   async function loadVoterCount(matchId) {
     const { data } = await supabase
@@ -251,6 +201,56 @@ export default function Pagelle() {
     const players = playersData.map(p => ({ ...p, team: teamMap[p.id] || "A" }))
     setResults(buildRanking(players, data))
   }
+
+  async function loadLastMatch() {
+    setLoading(true)
+    const { data: match } = await supabase
+      .from("matches").select("*")
+      .order("created_at", { ascending: false })
+      .limit(1).maybeSingle()
+
+    if (!match) { setLoading(false); return }
+    setLastMatch(match)
+
+    // Deadline = 24h dopo la creazione della partita
+    const deadline = new Date(match.created_at)
+    deadline.setHours(deadline.getHours() + 24)
+    setVoteDeadline(deadline)
+
+    const { data: mp } = await supabase
+      .from("match_players")
+      .select("team, players(id, name)")
+      .eq("match_id", match.id)
+
+    if (mp) {
+      const pA = mp.filter(x => x.team === "A").map(x => x.players)
+      const pB = mp.filter(x => x.team === "B").map(x => x.players)
+      setPlayersA(pA)
+      setPlayersB(pB)
+      setRankingA(pA)
+      setRankingB(pB)
+    }
+
+    // Controlla se l'utente ha già votato
+    if (player) {
+      const { data: myVote } = await supabase
+        .from("ratings")
+        .select("id")
+        .eq("match_id", match.id)
+        .eq("voter_id", player.id)
+        .limit(1)
+        .maybeSingle()
+      setHasVoted(!!myVote)
+    }
+
+    await loadResults(match.id)
+    await loadVoterCount(match.id)
+    setLoading(false)
+  }
+
+  // loadLastMatch intentionally runs once when the page mounts.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { queueMicrotask(loadLastMatch) }, [])
 
   async function handleSave() {
     if (isExpired) {

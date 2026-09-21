@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react"
 import { supabase } from "../supabaseClient"
-import { useAuth } from "../AuthContext"
+import { useAuth } from "../authContext"
 import Cropper from "react-easy-crop"
 
 const C = {

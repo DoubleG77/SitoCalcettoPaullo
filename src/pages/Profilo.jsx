@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { supabase } from "../supabaseClient"
-import { useAuth } from "../AuthContext"
+import { useAuth } from "../authContext"
 import { useSignedUrl } from "../hooks/useSignedUrl"
 import Cropper from "react-easy-crop"
 import { formatMatchDate } from "../matchDate"
@@ -129,7 +129,7 @@ export default function Profilo() {
   // Carica automaticamente il proprio profilo
   useEffect(() => {
     if (currentPlayer && !selected) loadProfile(currentPlayer)
-  }, [currentPlayer])
+  }, [currentPlayer, selected])
 
   async function loadProfile(player) {
     setSelected(player)

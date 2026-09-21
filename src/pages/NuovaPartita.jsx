@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
-import { useAuth } from "../AuthContext"
+import { useAuth } from "../authContext"
 import { getTodayDateInput } from "../matchDate"
+import { buildBalancedTeams } from "../teamBalance"
 
 const C = {
   bg: "#07131b",
@@ -55,6 +56,8 @@ export default function NuovaPartita() {
   const [playerSearch, setPlayerSearch] = useState("")
   const [saveError, setSaveError] = useState("")
   const [matchDate, setMatchDate] = useState(getTodayDateInput())
+  const [balancing, setBalancing] = useState(false)
+  const [balanceError, setBalanceError] = useState("")
 
   useEffect(() => {
     supabase.from("players").select("*").order("name").then(({ data }) => {
@@ -83,6 +86,81 @@ export default function NuovaPartita() {
   const totalGoalsB = Object.values(goalsB).reduce((s, v) => s + v, 0)
   const canSave = teamA.length === 6 && teamB.length === 6
     && totalGoalsA === scoreA && totalGoalsB === scoreB
+
+  const generateBalancedTeams = async () => {
+    const selectedPlayers = [...teamA, ...teamB]
+    if (selectedPlayers.length !== 12) {
+      setBalanceError("Seleziona esattamente 12 giocatori per generare le squadre.")
+      return
+    }
+
+    setBalancing(true)
+    setBalanceError("")
+
+    const [{ data: matches }, { data: matchPlayers }, { data: goals }, { data: ratings }] = await Promise.all([
+      supabase.from("matches").select("id, score_a, score_b"),
+      supabase.from("match_players").select("match_id, player_id, team"),
+      supabase.from("goals").select("match_id, player_id, count"),
+      supabase.from("ratings").select("match_id, candidate_id, position"),
+    ])
+
+    if (!matches || !matchPlayers || !goals || !ratings) {
+      setBalanceError("Non riesco a recuperare le statistiche dei giocatori.")
+      setBalancing(false)
+      return
+    }
+
+    const statsByPlayerId = {}
+    selectedPlayers.forEach(player => {
+      statsByPlayerId[player.id] = { goals: 0, played: 0, points: 0, ratingSum: 0, ratingCount: 0 }
+    })
+
+    matchPlayers.forEach(matchPlayer => {
+      const stats = statsByPlayerId[matchPlayer.player_id]
+      const match = matches.find(item => item.id === matchPlayer.match_id)
+      if (!stats || !match) return
+
+      stats.played += 1
+      const ownScore = matchPlayer.team === "A" ? match.score_a : match.score_b
+      const opponentScore = matchPlayer.team === "A" ? match.score_b : match.score_a
+      if (ownScore > opponentScore) stats.points += 3
+      if (ownScore === opponentScore) stats.points += 1
+    })
+
+    goals.forEach(goal => {
+      if (statsByPlayerId[goal.player_id]) statsByPlayerId[goal.player_id].goals += goal.count || 0
+    })
+
+    const ratingsByMatch = {}
+    ratings.forEach(rating => {
+      if (!ratingsByMatch[rating.match_id]) ratingsByMatch[rating.match_id] = []
+      ratingsByMatch[rating.match_id].push(rating)
+    })
+
+    Object.values(ratingsByMatch).forEach(matchRatings => {
+      const positions = matchRatings.map(rating => rating.position)
+      const min = Math.min(...positions)
+      const max = Math.max(...positions)
+      matchRatings.forEach(rating => {
+        const stats = statsByPlayerId[rating.candidate_id]
+        if (!stats) return
+        const ratingValue = max === min ? 6 : 9 - ((rating.position - min) / (max - min)) * 3
+        stats.ratingSum += ratingValue
+        stats.ratingCount += 1
+      })
+    })
+
+    Object.values(statsByPlayerId).forEach(stats => {
+      stats.averageRating = stats.ratingCount > 0 ? stats.ratingSum / stats.ratingCount : 0
+    })
+
+    const { teamA: generatedA, teamB: generatedB } = buildBalancedTeams(selectedPlayers, statsByPlayerId)
+    setTeamA(generatedA)
+    setTeamB(generatedB)
+    setGoalsA({})
+    setGoalsB({})
+    setBalancing(false)
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -265,6 +343,31 @@ export default function NuovaPartita() {
             <div style={{ color: C.muted, fontSize: 13, fontStyle: "italic" }}>Nessun giocatore trovato</div>
           )}
         </div>
+
+        <button
+          onClick={generateBalancedTeams}
+          disabled={balancing || teamA.length + teamB.length !== 12}
+          style={{
+            width: "100%",
+            background: teamA.length + teamB.length === 12 ? "rgba(113, 240, 176, 0.12)" : "rgba(148, 163, 184, 0.08)",
+            color: teamA.length + teamB.length === 12 ? C.accent : C.muted,
+            border: `1px solid ${teamA.length + teamB.length === 12 ? C.accent : C.border}50`,
+            borderRadius: 12,
+            padding: "11px 14px",
+            fontWeight: 800,
+            fontSize: 13,
+            cursor: balancing || teamA.length + teamB.length !== 12 ? "not-allowed" : "pointer",
+            marginBottom: 16,
+          }}
+        >
+          {balancing ? "CALCOLO SQUADRE..." : "GENERA SQUADRE BILANCIATE"}
+        </button>
+
+        {balanceError && (
+          <div role="alert" style={{ color: C.red, fontSize: 12, marginBottom: 16 }}>
+            {balanceError}
+          </div>
+        )}
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[

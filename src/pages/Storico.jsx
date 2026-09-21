@@ -52,8 +52,6 @@ export default function Storico() {
   const [detailLoading, setDetailLoading] = useState(null)
   const [search, setSearch] = useState("")
 
-  useEffect(() => { loadMatches() }, [])
-
   async function loadMatches() {
     setLoading(true)
     const { data } = await supabase
@@ -64,6 +62,8 @@ export default function Storico() {
     if (data) setMatches(data)
     setLoading(false)
   }
+
+  useEffect(() => { queueMicrotask(loadMatches) }, [])
 
   async function loadDetail(matchId) {
   if (details[matchId]) { setExpanded(expanded === matchId ? null : matchId); return }

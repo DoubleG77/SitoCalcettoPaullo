@@ -1,4 +1,4 @@
-import { useAuth } from "../AuthContext"
+import { useAuth } from "../authContext"
 
 const C = {
   bg: "#07131b",
