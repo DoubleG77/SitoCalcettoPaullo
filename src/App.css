@@ -1,42 +1,78 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  min-height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app-shell {
+  width: 100%;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.app-nav-inner {
+  display: contents;
+}
+
+@media (min-width: 900px) {
+  .app-shell {
+    padding-left: 244px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .app-header {
+    padding: 20px 42px !important;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .app-content {
+    padding: 34px 42px 48px !important;
   }
-}
 
-.card {
-  padding: 2em;
-}
+  .app-content-inner {
+    width: min(100%, 1180px);
+    margin: 0 auto;
+  }
 
-.read-the-docs {
-  color: #888;
+  .app-nav {
+    left: 0 !important;
+    top: 0;
+    bottom: 0;
+    width: 244px !important;
+    max-width: none !important;
+    transform: none !important;
+    display: block !important;
+    padding: 28px 14px;
+    border-top: none !important;
+    border-right: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .app-nav::before {
+    content: "IL CALCETTO";
+    display: block;
+    color: #71f0b0;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    padding: 0 16px 30px;
+  }
+
+  .app-nav-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .app-nav button {
+    flex-direction: row !important;
+    justify-content: flex-start;
+    gap: 14px !important;
+    padding: 14px 16px !important;
+    border-top: none !important;
+    border-left: 2px solid transparent !important;
+    border-radius: 10px;
+    text-align: left;
+  }
+
+  .app-nav button[aria-current="page"] {
+    border-left-color: #71f0b0 !important;
+  }
+
+  .app-nav button span:last-child {
+    font-size: 13px !important;
+  }
 }

@@ -66,17 +66,16 @@ export default function App() {
   }
 
   return (
-    <div style={{
+    <div className="app-shell" style={{
       background: "linear-gradient(180deg, rgba(5,10,15,0.96) 0%, rgba(11,19,29,0.96) 100%)",
       minHeight: "100vh",
-      maxWidth: 430,
       margin: "0 auto",
       position: "relative",
       display: "flex",
       flexDirection: "column",
       boxShadow: "0 0 0 1px rgba(148, 163, 184, 0.08)",
     }}>
-      <div style={{
+      <div className="app-header" style={{
         background: "rgba(10, 18, 25, 0.92)",
         borderBottom: "1px solid rgba(148, 163, 184, 0.12)",
         backdropFilter: "blur(10px)",
@@ -144,11 +143,13 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ flex: 1, padding: "18px 16px 92px" }}>
-        {pages[page]}
-      </div>
+      <main className="app-content" style={{ flex: 1, padding: "18px 16px 92px" }}>
+        <div className="app-content-inner">
+          {pages[page]}
+        </div>
+      </main>
 
-      <div style={{
+      <nav className="app-nav" aria-label="Navigazione principale" style={{
         position: "fixed",
         bottom: 0,
         left: "50%",
@@ -162,6 +163,7 @@ export default function App() {
         gridTemplateColumns: "repeat(7, 1fr)",
         zIndex: 20,
       }}>
+        <div className="app-nav-inner">
         {NAV.map(item => (
           <button key={item.id} onClick={() => setPage(item.id)} aria-label={item.label}
             aria-current={page === item.id ? "page" : undefined} style={{
@@ -182,7 +184,8 @@ export default function App() {
             </span>
           </button>
         ))}
-      </div>
+        </div>
+      </nav>
     </div>
   )
 }
