@@ -57,12 +57,9 @@ export default function Classifica() {
 
     if (!matches || !matchPlayers) { setLoading(false); return }
 
-    // Calcola voto medio per giocatore su tutte le partite
-    // Per ogni partita, ricostruisci la classifica e assegna il voto
     const votoSum = {}
     const votoCount = {}
 
-    // Raggruppa ratings per partita
     const ratingsByMatch = {}
     allRatings?.forEach(r => {
       if (!ratingsByMatch[r.match_id]) ratingsByMatch[r.match_id] = []
@@ -79,7 +76,6 @@ export default function Classifica() {
       })
     })
 
-    // Calcola stats partite
     const stats = {}
     matchPlayers.forEach(mp => {
       const name = mp.players.name
@@ -111,24 +107,104 @@ export default function Classifica() {
     setLoading(false)
   }
 
-  if (loading) return <div style={{ color: "#6b6b8a", textAlign: "center", padding: 60 }}>Caricamento...</div>
-
-  if (standings.length === 0) return (
-    <div style={{ textAlign: "center", padding: 60 }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>🏆</div>
-      <div style={{ color: C.text, fontSize: 18, fontWeight: 700 }}>Nessuna partita ancora</div>
+  if (loading) return (
+    <div style={{
+      background: "rgba(16, 35, 50, 0.85)",
+      border: "1px solid rgba(148, 163, 184, 0.12)",
+      borderRadius: 20,
+      padding: "54px 20px",
+      textAlign: "center",
+      color: "#9bb2c6",
+      fontWeight: 600,
+    }}>
+      Caricamento...
     </div>
   )
 
+  if (standings.length === 0) return (
+    <div style={{
+      background: "rgba(16, 35, 50, 0.85)",
+      border: "1px solid rgba(148, 163, 184, 0.12)",
+      borderRadius: 20,
+      padding: "54px 20px",
+      textAlign: "center",
+    }}>
+      <div style={{ fontSize: 48, marginBottom: 12 }}>🏆</div>
+      <div style={{ color: "#edf6ff", fontSize: 18, fontWeight: 800 }}>Nessuna partita ancora</div>
+    </div>
+  )
+
+  const podium = standings.slice(0, 3)
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ color: C.muted, fontSize: 11, letterSpacing: 2 }}>STAGIONE 2025/26</div>
-
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+        <div>
+          <div style={{ color: "#9bb2c6", fontSize: 10, letterSpacing: 2.5, fontWeight: 700 }}>STAGIONE 2026/27</div>
+          <div style={{ color: "#edf6ff", fontSize: 26, fontWeight: 900, marginTop: 4 }}>Classifica</div>
+        </div>
         <div style={{
-          display: "grid", gridTemplateColumns: "28px 1fr 32px 32px 32px 32px 40px 44px",
-          background: C.surface, padding: "10px 14px",
-          color: C.muted, fontSize: 10, letterSpacing: 1, fontWeight: 700,
+          background: "rgba(113, 240, 176, 0.08)",
+          border: "1px solid rgba(113, 240, 176, 0.2)",
+          color: "#71f0b0",
+          borderRadius: 999,
+          padding: "7px 12px",
+          fontSize: 11,
+          fontWeight: 800,
+          letterSpacing: 0.8,
+        }}>
+          {standings.length} giocatori
+        </div>
+      </div>
+
+      <div style={{
+        background: "linear-gradient(180deg, rgba(18, 38, 58, 0.95), rgba(13, 24, 34, 0.9))",
+        borderRadius: 20,
+        border: "1px solid rgba(148, 163, 184, 0.12)",
+        padding: 14,
+        boxShadow: "0 18px 28px rgba(2, 6, 10, 0.28)",
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 10,
+      }}>
+        {podium.map((player, index) => {
+          const medals = ["🥇", "🥈", "🥉"]
+          const colors = ["#f7c75d", "#d1d5db", "#d39a67"]
+
+          return (
+            <div key={player.name} style={{
+              background: "rgba(8, 19, 29, 0.75)",
+              border: "1px solid rgba(148, 163, 184, 0.14)",
+              borderRadius: 16,
+              padding: "12px 10px",
+              textAlign: "center",
+            }}>
+              <div style={{ color: colors[index], fontSize: 24 }}>{medals[index]}</div>
+              <div style={{ color: "#edf6ff", fontSize: 12, fontWeight: 800, marginTop: 2 }}>{player.name}</div>
+              <div style={{ color: "#9bb2c6", fontSize: 11, marginTop: 4 }}>{player.pts} pts</div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div style={{
+        background: "rgba(16, 35, 50, 0.85)",
+        border: "1px solid rgba(148, 163, 184, 0.12)",
+        borderRadius: 20,
+        overflow: "hidden",
+        boxShadow: "0 12px 30px rgba(2, 6, 10, 0.2)",
+      }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "28px 1fr 36px 36px 36px 36px 42px 48px",
+          gap: 4,
+          background: "rgba(8, 19, 29, 0.95)",
+          padding: "10px 12px",
+          color: "#8fa6ba",
+          fontSize: 9,
+          letterSpacing: 1.1,
+          fontWeight: 800,
+          textTransform: "uppercase",
         }}>
           <span>#</span>
           <span>Giocatore</span>
@@ -142,39 +218,66 @@ export default function Classifica() {
 
         {standings.map((p, i) => {
           const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null
-          const votoColor = p.votoMedio >= 8 ? C.gold : p.votoMedio >= 6.5 ? C.accent : p.votoMedio >= 5 ? C.text : C.muted
+          const votoColor = p.votoMedio >= 8 ? "#f7c75d" : p.votoMedio >= 6.5 ? "#71f0b0" : p.votoMedio >= 5 ? "#edf6ff" : "#8fa6ba"
+          const isLeader = i === 0
+
           return (
             <div key={p.name} style={{
-              display: "grid", gridTemplateColumns: "28px 1fr 32px 32px 32px 32px 40px 44px",
-              padding: "11px 14px", alignItems: "center",
-              borderTop: `1px solid ${C.border}`,
-              background: i === 0 ? C.accent + "08" : "transparent",
+              display: "grid",
+              gridTemplateColumns: "28px 1fr 36px 36px 36px 36px 42px 48px",
+              gap: 4,
+              padding: "12px 12px",
+              alignItems: "center",
+              borderTop: "1px solid rgba(148, 163, 184, 0.12)",
+              background: isLeader ? "rgba(113, 240, 176, 0.06)" : "transparent",
             }}>
-              <span style={{ color: medal ? C.gold : C.muted, fontSize: 13, fontWeight: 700 }}>
+              <span style={{ color: medal ? "#f7c75d" : "#8fa6ba", fontSize: 13, fontWeight: 800 }}>
                 {medal || i + 1}
               </span>
-              <span style={{ color: C.text, fontWeight: 600, fontSize: 13 }}>{p.name}</span>
-              <span style={{ color: C.muted, fontSize: 12, textAlign: "center" }}>{p.played}</span>
-              <span style={{ color: C.accent, fontSize: 12, textAlign: "center", fontWeight: 700 }}>{p.w}</span>
-              <span style={{ color: C.muted, fontSize: 12, textAlign: "center" }}>{p.d}</span>
-              <span style={{ color: C.red, fontSize: 12, textAlign: "center" }}>{p.l}</span>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: isLeader ? "#71f0b0" : "rgba(148, 163, 184, 0.5)",
+                  display: "inline-block",
+                }} />
+                <span style={{ color: "#edf6ff", fontWeight: 700, fontSize: 13 }}>{p.name}</span>
+              </div>
+
+              <span style={{ color: "#9bb2c6", fontSize: 12, textAlign: "center" }}>{p.played}</span>
+              <span style={{ color: "#71f0b0", fontSize: 12, textAlign: "center", fontWeight: 800 }}>{p.w}</span>
+              <span style={{ color: "#9bb2c6", fontSize: 12, textAlign: "center" }}>{p.d}</span>
+              <span style={{ color: "#ff8b9d", fontSize: 12, textAlign: "center" }}>{p.l}</span>
+
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <span style={{
-                  background: i === 0 ? C.accent : C.accent + "20",
-                  color: i === 0 ? "#0a0a0f" : C.accent,
-                  borderRadius: 6, padding: "2px 8px",
-                  fontWeight: 900, fontSize: 12,
+                  background: isLeader ? "#71f0b0" : "rgba(113, 240, 176, 0.12)",
+                  color: isLeader ? "#08131d" : "#71f0b0",
+                  borderRadius: 8,
+                  padding: "4px 7px",
+                  fontWeight: 900,
+                  fontSize: 11,
+                  minWidth: 28,
+                  textAlign: "center",
                 }}>{p.pts}</span>
               </div>
+
               <div style={{ display: "flex", justifyContent: "center" }}>
                 {p.votoMedio ? (
                   <span style={{
-                    background: votoColor + "20", color: votoColor,
-                    borderRadius: 6, padding: "2px 8px",
-                    fontWeight: 900, fontSize: 12,
+                    background: `${votoColor}20`,
+                    color: votoColor,
+                    borderRadius: 8,
+                    padding: "4px 7px",
+                    fontWeight: 900,
+                    fontSize: 11,
+                    minWidth: 32,
+                    textAlign: "center",
                   }}>{p.votoMedio}</span>
                 ) : (
-                  <span style={{ color: C.muted, fontSize: 11 }}>—</span>
+                  <span style={{ color: "#8fa6ba", fontSize: 11 }}>—</span>
                 )}
               </div>
             </div>

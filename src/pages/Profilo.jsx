@@ -19,16 +19,23 @@ async function getCroppedImg(imageSrc, croppedAreaPixels) {
 }
 
 const C = {
-  card: "#1a1a24", border: "#2a2a3a", accent: "#00e676",
-  red: "#ff4444", text: "#f0f0f0", muted: "#6b6b8a",
-  surface: "#13131a", gold: "#ffd700",
+  card: "#12263a",
+  border: "rgba(148, 163, 184, 0.16)",
+  accent: "#71f0b0",
+  red: "#ff7c8b",
+  text: "#edf6ff",
+  muted: "#9bb2c6",
+  surface: "#0d1f2c",
+  gold: "#f7c75d",
 }
 
 const Card = ({ children, style = {}, glow = false }) => (
   <div style={{
-    background: C.card, borderRadius: 12, padding: 18,
+    background: "linear-gradient(180deg, rgba(18,38,58,0.96), rgba(13,24,34,0.92))",
+    borderRadius: 20,
+    padding: 18,
     border: `1px solid ${glow ? C.accent + "60" : C.border}`,
-    boxShadow: glow ? `0 0 24px ${C.accent}15` : "none",
+    boxShadow: glow ? "0 16px 30px rgba(0,0,0,0.22)" : "0 10px 24px rgba(2, 6, 10, 0.16)",
     ...style
   }}>{children}</div>
 )

@@ -45,17 +45,16 @@ export default function App() {
   const { user, player, loading, signOut, refreshPlayer } = useAuth()
 
   if (loading) return (
-    <div style={{ background: "#0a0a0f", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: "#00e676", fontSize: 32 }}>⚽</div>
+    <div style={{ background: "linear-gradient(180deg, #07121b 0%, #0d1b29 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ color: "#71f0b0", fontSize: 32 }}>⚽</div>
     </div>
   )
 
   if (!user) return <Login />
   if (!player) return <Setup onComplete={refreshPlayer} />
 
-
   const current = NAV.find(n => n.id === page)
-  
+
   const pages = {
     home: <Home onNavigate={setPage} />,
     classifica: <Classifica />,
@@ -67,17 +66,34 @@ export default function App() {
   }
 
   return (
-    <div style={{ background: "#0a0a0f", minHeight: "100vh", maxWidth: 420, margin: "0 auto", position: "relative", display: "flex", flexDirection: "column" }}>
-
-      {/* Header */}
+    <div style={{
+      background: "linear-gradient(180deg, rgba(5,10,15,0.96) 0%, rgba(11,19,29,0.96) 100%)",
+      minHeight: "100vh",
+      maxWidth: 430,
+      margin: "0 auto",
+      position: "relative",
+      display: "flex",
+      flexDirection: "column",
+      boxShadow: "0 0 0 1px rgba(148, 163, 184, 0.08)",
+    }}>
       <div style={{
-        background: "#13131a", borderBottom: "1px solid #2a2a3a",
-        padding: "14px 20px", position: "sticky", top: 0, zIndex: 10,
-        display: "flex", justifyContent: "space-between", alignItems: "center"
+        background: "rgba(10, 18, 25, 0.92)",
+        borderBottom: "1px solid rgba(148, 163, 184, 0.12)",
+        backdropFilter: "blur(10px)",
+        padding: "14px 18px",
+        position: "sticky",
+        top: 0,
+        zIndex: 10,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
       }}>
         <div>
-          <div style={{ color: "#00e676", fontSize: 11, letterSpacing: 3, fontWeight: 700 }}>IL CALCETTO</div>
-          <div style={{ color: "#f0f0f0", fontSize: 17, fontWeight: 900 }}>{current?.icon} {current?.label}</div>
+          <div style={{ color: "#71f0b0", fontSize: 10, letterSpacing: 3, fontWeight: 800, marginBottom: 3 }}>IL CALCETTO</div>
+          <div style={{ color: "#edf6ff", fontSize: 18, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
+            <span>{current?.icon}</span>
+            <span>{current?.label}</span>
+          </div>
         </div>
         <div style={{ position: "relative" }}>
           <HeaderAvatar
@@ -86,53 +102,84 @@ export default function App() {
           />
           {profileMenuOpen && (
             <div style={{
-              position: "absolute", top: 46, right: 0, width: 150,
-              background: "#1a1a24", border: "1px solid #2a2a3a",
-              borderRadius: 10, padding: 6, boxShadow: "0 8px 24px #00000050",
+              position: "absolute",
+              top: 48,
+              right: 0,
+              width: 160,
+              background: "rgba(16, 35, 50, 0.98)",
+              border: "1px solid rgba(148, 163, 184, 0.18)",
+              borderRadius: 14,
+              padding: 8,
+              boxShadow: "0 18px 38px rgba(0,0,0,0.38)",
               zIndex: 30,
             }}>
               <button onClick={() => { setPage("profilo"); setProfileMenuOpen(false) }} style={{
-                width: "100%", background: "transparent", border: "none",
-                color: "#f0f0f0", padding: "10px 12px", textAlign: "left",
-                borderRadius: 6, cursor: "pointer", fontSize: 13,
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                color: "#edf6ff",
+                padding: "10px 12px",
+                textAlign: "left",
+                borderRadius: 10,
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 600,
               }}>Profilo</button>
               <button onClick={() => {
                 if (window.confirm("Vuoi uscire dall'app?")) signOut()
               }} style={{
-                width: "100%", background: "transparent", border: "none",
-                color: "#ff7777", padding: "10px 12px", textAlign: "left",
-                borderRadius: 6, cursor: "pointer", fontSize: 13,
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                color: "#ff8b9d",
+                padding: "10px 12px",
+                textAlign: "left",
+                borderRadius: 10,
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 700,
               }}>Esci</button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Content */}
-      <div style={{ flex: 1, padding: "16px 16px 90px" }}>
+      <div style={{ flex: 1, padding: "18px 16px 92px" }}>
         {pages[page]}
       </div>
 
-      {/* Bottom nav */}
       <div style={{
-        position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
-        width: "100%", maxWidth: 420,
-        background: "#13131a", borderTop: "1px solid #2a2a3a",
-        display: "grid", gridTemplateColumns: "repeat(7, 1fr)", zIndex: 20,
+        position: "fixed",
+        bottom: 0,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "100%",
+        maxWidth: 430,
+        background: "rgba(12, 22, 30, 0.96)",
+        borderTop: "1px solid rgba(148, 163, 184, 0.12)",
+        backdropFilter: "blur(12px)",
+        display: "grid",
+        gridTemplateColumns: "repeat(7, 1fr)",
+        zIndex: 20,
       }}>
         {NAV.map(item => (
           <button key={item.id} onClick={() => setPage(item.id)} aria-label={item.label}
             aria-current={page === item.id ? "page" : undefined} style={{
-            background: "transparent", border: "none",
-            padding: "10px 4px 12px",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+            background: page === item.id ? "rgba(113, 240, 176, 0.08)" : "transparent",
+            border: "none",
+            padding: "10px 2px 12px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 5,
             cursor: "pointer",
+            borderTop: page === item.id ? "2px solid #71f0b0" : "2px solid transparent",
+            transition: "all 0.2s ease",
           }}>
             <span style={{ fontSize: 15 }}>{item.icon}</span>
-            <span style={{ fontSize: 9, fontWeight: 600, color: page === item.id ? "#00e676" : "#6b6b8a" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, color: page === item.id ? "#71f0b0" : "#7f93a7" }}>
               {item.label}
             </span>
-            {page === item.id && <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#00e676" }} />}
           </button>
         ))}
       </div>

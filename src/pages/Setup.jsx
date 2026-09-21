@@ -4,8 +4,13 @@ import { useAuth } from "../AuthContext"
 import Cropper from "react-easy-crop"
 
 const C = {
-  bg: "#0a0a0f", card: "#1a1a24", border: "#2a2a3a",
-  accent: "#00e676", text: "#f0f0f0", muted: "#6b6b8a", surface: "#13131a",
+  bg: "#07131b",
+  card: "#12263a",
+  border: "rgba(148, 163, 184, 0.16)",
+  accent: "#71f0b0",
+  text: "#edf6ff",
+  muted: "#9bb2c6",
+  surface: "#0d1f2c",
 }
 
 // Utility per ritagliare l'immagine

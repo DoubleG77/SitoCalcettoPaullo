@@ -2,24 +2,40 @@ import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 
 const C = {
-  bg: "#0a0a0f", surface: "#13131a", card: "#1a1a24",
-  border: "#2a2a3a", accent: "#00e676", red: "#ff4444",
-  gold: "#ffd700", text: "#f0f0f0", muted: "#6b6b8a",
+  bg: "#07131b",
+  surface: "#0d1f2c",
+  card: "#12263a",
+  border: "rgba(148, 163, 184, 0.16)",
+  accent: "#71f0b0",
+  accentStrong: "#35d98c",
+  red: "#ff7c8b",
+  gold: "#f7c75d",
+  text: "#edf6ff",
+  muted: "#9bb2c6",
 }
 
 const Card = ({ children, style = {}, glow = false }) => (
   <div style={{
-    background: C.card, borderRadius: 12, padding: 18,
+    background: "linear-gradient(180deg, rgba(18,38,58,0.96), rgba(13,24,34,0.92))",
+    borderRadius: 20,
+    padding: 18,
     border: `1px solid ${glow ? C.accent + "60" : C.border}`,
-    boxShadow: glow ? `0 0 24px ${C.accent}15` : "none",
+    boxShadow: glow ? "0 16px 30px rgba(0,0,0,0.22)" : "0 10px 24px rgba(2, 6, 10, 0.16)",
     ...style
   }}>{children}</div>
 )
 
 const Badge = ({ children, color = C.accent }) => (
   <span style={{
-    background: color + "20", color, border: `1px solid ${color}40`,
-    borderRadius: 4, padding: "2px 8px", fontSize: 11, fontWeight: 700, letterSpacing: 1,
+    background: color + "18",
+    color,
+    border: `1px solid ${color}40`,
+    borderRadius: 999,
+    padding: "6px 10px",
+    fontSize: 10,
+    fontWeight: 800,
+    letterSpacing: 1.1,
+    textTransform: "uppercase",
   }}>{children}</span>
 )
 
