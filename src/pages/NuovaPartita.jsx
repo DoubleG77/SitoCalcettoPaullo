@@ -58,6 +58,7 @@ export default function NuovaPartita() {
   const [matchDate, setMatchDate] = useState(getTodayDateInput())
   const [balancing, setBalancing] = useState(false)
   const [balanceError, setBalanceError] = useState("")
+  const [shareStatus, setShareStatus] = useState("")
 
   useEffect(() => {
     supabase.from("players").select("*").order("name").then(({ data }) => {
@@ -190,6 +191,32 @@ export default function NuovaPartita() {
     setGoalsA({})
     setGoalsB({})
     setBalancing(false)
+  }
+
+  const shareTeams = async () => {
+    const teamNameA = nameA.trim() || "Squadra A"
+    const teamNameB = nameB.trim() || "Squadra B"
+    const shareText = [
+      "⚽ Squadre calcetto",
+      "",
+      `${teamNameA}:`,
+      ...teamA.map(player => `- ${player.name}`),
+      "",
+      `${teamNameB}:`,
+      ...teamB.map(player => `- ${player.name}`),
+    ].join("\n")
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Squadre calcetto", text: shareText })
+        setShareStatus("Squadre condivise")
+      } else {
+        await navigator.clipboard.writeText(shareText)
+        setShareStatus("Squadre copiate negli appunti")
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") setShareStatus("Condivisione non riuscita")
+    }
   }
 
   const handleSave = async () => {
@@ -436,6 +463,29 @@ export default function NuovaPartita() {
             </div>
           ))}
         </div>
+
+        {teamA.length === 6 && teamB.length === 6 && (
+          <div style={{ marginTop: 14 }}>
+            <button onClick={shareTeams} style={{
+              width: "100%",
+              background: "rgba(247, 199, 93, 0.1)",
+              color: "#f7c75d",
+              border: "1px solid rgba(247, 199, 93, 0.3)",
+              borderRadius: 12,
+              padding: "11px 14px",
+              fontWeight: 800,
+              fontSize: 13,
+              cursor: "pointer",
+            }}>
+              CONDIVIDI SQUADRE
+            </button>
+            {shareStatus && (
+              <div role="status" style={{ color: C.muted, fontSize: 12, textAlign: "center", marginTop: 8 }}>
+                {shareStatus}
+              </div>
+            )}
+          </div>
+        )}
       </Card>
 
       <Card>
