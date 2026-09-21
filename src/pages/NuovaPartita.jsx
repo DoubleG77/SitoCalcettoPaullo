@@ -154,7 +154,37 @@ export default function NuovaPartita() {
       stats.averageRating = stats.ratingCount > 0 ? stats.ratingSum / stats.ratingCount : 0
     })
 
-    const { teamA: generatedA, teamB: generatedB } = buildBalancedTeams(selectedPlayers, statsByPlayerId)
+    const pairHistory = {}
+    const addPairHistory = (firstId, secondId, points, goalDifference) => {
+      const key = [String(firstId), String(secondId)].sort().join(":")
+      if (!pairHistory[key]) pairHistory[key] = { matches: 0, points: 0, goalDifference: 0 }
+      pairHistory[key].matches += 1
+      pairHistory[key].points += points
+      pairHistory[key].goalDifference += goalDifference
+    }
+
+    matches.forEach(match => {
+      const playersByTeam = { A: [], B: [] }
+      matchPlayers
+        .filter(matchPlayer => matchPlayer.match_id === match.id)
+        .forEach(matchPlayer => {
+          if (playersByTeam[matchPlayer.team]) playersByTeam[matchPlayer.team].push(matchPlayer.player_id)
+        })
+
+      Object.entries(playersByTeam).forEach(([team, teamPlayers]) => {
+        const ownScore = team === "A" ? match.score_a : match.score_b
+        const opponentScore = team === "A" ? match.score_b : match.score_a
+        const points = ownScore > opponentScore ? 3 : ownScore === opponentScore ? 1 : 0
+        const goalDifference = ownScore - opponentScore
+        for (let first = 0; first < teamPlayers.length; first += 1) {
+          for (let second = first + 1; second < teamPlayers.length; second += 1) {
+            addPairHistory(teamPlayers[first], teamPlayers[second], points, goalDifference)
+          }
+        }
+      })
+    })
+
+    const { teamA: generatedA, teamB: generatedB } = buildBalancedTeams(selectedPlayers, statsByPlayerId, pairHistory)
     setTeamA(generatedA)
     setTeamB(generatedB)
     setGoalsA({})
