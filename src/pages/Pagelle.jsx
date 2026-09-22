@@ -43,6 +43,39 @@ function buildRanking(players, ratingsData) {
     .map((p, i, arr) => ({ ...p, voto: getVoto(i, arr.length) }))
 }
 
+function buildIndividualRatings(players, ratingsData, teamMap, currentPlayerId) {
+  const playersMap = Object.fromEntries(players.map(p => [p.id, p]))
+  const voters = {}
+
+  ratingsData.forEach(rating => {
+    if (!rating.voter_id || rating.voter_id === currentPlayerId) return
+
+    if (!voters[rating.voter_id]) {
+      voters[rating.voter_id] = {
+        id: rating.voter_id,
+        name: playersMap[rating.voter_id]?.name || "Votante non riconosciuto",
+        playersA: [],
+        playersB: [],
+      }
+    }
+
+    const candidate = playersMap[rating.candidate_id]
+    if (!candidate || !Number.isFinite(Number(rating.position))) return
+
+    const ratedPlayer = { ...candidate, position: Number(rating.position) }
+    if (teamMap[candidate.id] === "B") voters[rating.voter_id].playersB.push(ratedPlayer)
+    else voters[rating.voter_id].playersA.push(ratedPlayer)
+  })
+
+  return Object.values(voters)
+    .map(voter => ({
+      ...voter,
+      playersA: voter.playersA.sort((a, b) => a.position - b.position),
+      playersB: voter.playersB.sort((a, b) => a.position - b.position),
+    }))
+    .filter(voter => voter.playersA.length > 0 || voter.playersB.length > 0)
+}
+
 function useCountdown(targetDate) {
   const [timeLeft, setTimeLeft] = useState("")
 
@@ -164,6 +197,8 @@ export default function Pagelle() {
   const [loading, setLoading] = useState(true)
   const [hasVoted, setHasVoted] = useState(false)
   const [voterCount, setVoterCount] = useState(0)
+  const [individualRatings, setIndividualRatings] = useState([])
+  const [expandedVoter, setExpandedVoter] = useState(null)
   const [voteDeadline, setVoteDeadline] = useState(null)
   const [saveError, setSaveError] = useState("")
 
@@ -184,11 +219,11 @@ export default function Pagelle() {
 
   async function loadResults(matchId) {
     const { data } = await supabase
-      .from("ratings").select("candidate_id, position")
+      .from("ratings").select("voter_id, candidate_id, position")
       .eq("match_id", matchId)
     if (!data || data.length === 0) return
 
-    const ids = [...new Set(data.map(r => r.candidate_id))]
+    const ids = [...new Set(data.flatMap(r => [r.candidate_id, r.voter_id]).filter(Boolean))]
     const { data: playersData } = await supabase
       .from("players").select("id, name").in("id", ids)
     if (!playersData) return
@@ -200,6 +235,7 @@ export default function Pagelle() {
 
     const players = playersData.map(p => ({ ...p, team: teamMap[p.id] || "A" }))
     setResults(buildRanking(players, data))
+    setIndividualRatings(buildIndividualRatings(playersData, data, teamMap, player?.id))
   }
 
   async function loadLastMatch() {
@@ -412,6 +448,71 @@ export default function Pagelle() {
           })}
         </Card>
       )}
+
+      <div>
+        <div style={{ color: C.muted, fontSize: 11, letterSpacing: 2, margin: "4px 0 10px" }}>
+          PAGELLE DEGLI ALTRI
+        </div>
+        {individualRatings.length === 0 ? (
+          <Card>
+            <div style={{ color: C.muted, fontSize: 13, textAlign: "center" }}>
+              {voterCount > 0 ? "Nessun altro votante da mostrare" : "Nessuno ha ancora pubblicato una pagella"}
+            </div>
+          </Card>
+        ) : (
+          individualRatings.map(voter => {
+            const isExpanded = expandedVoter === voter.id
+            return (
+              <Card key={voter.id} style={{ marginBottom: 10, padding: 0, overflow: "hidden" }}>
+                <button
+                  onClick={() => setExpandedVoter(isExpanded ? null : voter.id)}
+                  aria-expanded={isExpanded}
+                  style={{
+                    width: "100%", display: "flex", alignItems: "center", gap: 10,
+                    background: "transparent", color: C.text, border: "none",
+                    padding: "14px 18px", cursor: "pointer", textAlign: "left",
+                  }}
+                >
+                  <span style={{
+                    width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
+                    background: C.accent + "20", color: C.accent,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontWeight: 900,
+                  }}>{voter.name[0]?.toUpperCase()}</span>
+                  <span style={{ flex: 1, fontWeight: 700 }}>{voter.name}</span>
+                  <span style={{ color: C.muted, fontSize: 16 }}>{isExpanded ? "▲" : "▼"}</span>
+                </button>
+
+                {isExpanded && (
+                  <div style={{
+                    borderTop: `1px solid ${C.border}`, padding: "12px 18px 16px",
+                    background: C.surface,
+                  }}>
+                    {[
+                      { name: lastMatch.team_a_name, players: voter.playersA, color: C.accent },
+                      { name: lastMatch.team_b_name, players: voter.playersB, color: C.red },
+                    ].map((team, teamIndex) => (
+                      <div key={team.name} style={{ marginBottom: teamIndex === 0 ? 12 : 0 }}>
+                        <div style={{ color: team.color, fontSize: 10, letterSpacing: 1, fontWeight: 700, marginBottom: 6 }}>
+                          {team.name.toUpperCase()}
+                        </div>
+                        {team.players.length === 0 ? (
+                          <div style={{ color: C.muted, fontSize: 12 }}>Nessun voto disponibile</div>
+                        ) : team.players.map(ratedPlayer => (
+                          <div key={ratedPlayer.id} style={{ display: "flex", gap: 8, padding: "4px 0" }}>
+                            <span style={{ color: team.color, fontWeight: 900, width: 18 }}>{ratedPlayer.position}</span>
+                            <span style={{ color: C.text, fontSize: 13 }}>{ratedPlayer.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )
+          })
+        )}
+      </div>
     </div>
   )
 
