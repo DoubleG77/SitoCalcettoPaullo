@@ -11,7 +11,12 @@ import NuovaPartita from "./pages/NuovaPartita"
 import Setup from "./pages/Setup"
 import { useSignedUrl } from "./hooks/useSignedUrl"
 import AppIcon from "./components/AppIcon"
-import { dismissStoredNotification, getStoredNotifications } from "./notifications"
+import {
+  dismissStoredNotification,
+  getStoredNotifications,
+  requestNotificationPermission,
+  shouldAskForNotificationPermission,
+} from "./notifications"
 
 const NAV = [
   { id: "home", label: "Home", icon: "goals" },
@@ -50,6 +55,12 @@ export default function App() {
   useEffect(() => {
     setNotifications(getStoredNotifications())
   }, [page])
+
+  useEffect(() => {
+    if (user && player && shouldAskForNotificationPermission()) {
+      requestNotificationPermission()
+    }
+  }, [user, player])
 
   const latestNotification = notifications[0]
 
@@ -98,6 +109,23 @@ export default function App() {
               <div style={{ color: "#71f0b0", fontSize: 10, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase" }}>Notifica</div>
               <div style={{ color: "#edf6ff", fontSize: 15, fontWeight: 800, marginTop: 4 }}>{latestNotification.title}</div>
               <div style={{ color: "#dceaf8", fontSize: 12, marginTop: 4 }}>{latestNotification.body}</div>
+              <button onClick={() => {
+                dismissStoredNotification(latestNotification.id)
+                setNotifications(getStoredNotifications())
+                setPage("pagelle")
+              }} style={{
+                marginTop: 10,
+                background: "#71f0b0",
+                color: "#07131b",
+                border: "none",
+                borderRadius: 10,
+                padding: "8px 12px",
+                fontSize: 11,
+                fontWeight: 900,
+                letterSpacing: 0.8,
+                textTransform: "uppercase",
+                cursor: "pointer",
+              }}>Vai alle pagelle</button>
             </div>
             <button onClick={() => {
               dismissStoredNotification(latestNotification.id)

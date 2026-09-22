@@ -1,4 +1,5 @@
 const STORAGE_KEY = "calcetto_notifications"
+const PERMISSION_PROMPT_KEY = "calcetto_notification_permission_prompted"
 
 export function getStoredNotifications() {
   if (typeof window === "undefined") return []
@@ -19,6 +20,14 @@ export function dismissStoredNotification(id) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(current))
 }
 
+export function shouldAskForNotificationPermission() {
+  if (typeof window === "undefined" || !("Notification" in window)) return false
+  if (Notification.permission !== "default") return false
+
+  const prompted = window.localStorage.getItem(PERMISSION_PROMPT_KEY) === "1"
+  return !prompted
+}
+
 export function notifyMatchAdded() {
   const title = "Pagelle aperte"
   const body = "Nuova partita inserita: apri le pagelle e vota!"
@@ -35,17 +44,31 @@ export function notifyMatchAdded() {
     const next = [entry, ...current].slice(0, 8)
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
 
-    if ("Notification" in window) {
-      if (Notification.permission === "granted") {
-        const notification = new Notification(title, {
-          body,
-          icon: "/logo-square.jpg",
-        })
+    if ("Notification" in window && Notification.permission === "granted") {
+      const show = () => {
+        try {
+          if (navigator.serviceWorker?.ready) {
+            navigator.serviceWorker.ready.then((registration) => {
+              registration.showNotification(title, {
+                body,
+                icon: "/logo-square.jpg",
+                badge: "/logo-square.jpg",
+              })
+            }).catch(() => {
+              const notification = new Notification(title, { body, icon: "/logo-square.jpg" })
+              setTimeout(() => notification.close?.(), 6000)
+            })
+            return
+          }
 
-        setTimeout(() => {
-          notification.close?.()
-        }, 6000)
+          const notification = new Notification(title, { body, icon: "/logo-square.jpg" })
+          setTimeout(() => notification.close?.(), 6000)
+        } catch {
+          // noop: some browsers block the constructor in web app contexts.
+        }
       }
+
+      show()
     }
   }
 
@@ -57,9 +80,10 @@ export async function requestNotificationPermission() {
     return "unsupported"
   }
 
-  if (Notification.permission === "default") {
-    return Notification.requestPermission()
+  if (Notification.permission !== "default") {
+    return Notification.permission
   }
 
-  return Notification.permission
+  window.localStorage.setItem(PERMISSION_PROMPT_KEY, "1")
+  return Notification.requestPermission()
 }
