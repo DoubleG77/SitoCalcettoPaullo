@@ -1,4 +1,5 @@
 import { useAuth } from "../authContext"
+import AppIcon from "../components/AppIcon"
 
 const C = {
   bg: "#07131b",
@@ -66,7 +67,7 @@ export default function Login() {
               boxShadow: "0 16px 26px rgba(53, 217, 140, 0.12)",
               fontSize: 32,
             }}>
-              ⚽
+              <AppIcon name="goals" size={34} color={C.accent} strokeWidth={1.6} />
             </div>
 
             <div style={{
@@ -106,9 +107,9 @@ export default function Login() {
               marginTop: 22,
             }}>
               {[
-                ["🏆", "Classifica"],
-                ["👟", "Marcatori"],
-                ["📊", "Pagelle"],
+                ["trophy", "Classifica"],
+                ["boots", "Marcatori"],
+                ["ratings", "Pagelle"],
               ].map(([icon, label]) => (
                 <div key={label} style={{
                   background: "rgba(17, 40, 58, 0.7)",
@@ -119,7 +120,7 @@ export default function Login() {
                   fontWeight: 700,
                   fontSize: 12,
                 }}>
-                  <div style={{ fontSize: 18, marginBottom: 4 }}>{icon}</div>
+                  <AppIcon name={icon} size={18} color={C.accent} strokeWidth={1.8} />
                   <div>{label}</div>
                 </div>
               ))}

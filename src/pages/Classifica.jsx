@@ -1,3 +1,4 @@
+import AppIcon from "../components/AppIcon"
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 
@@ -129,7 +130,7 @@ export default function Classifica() {
       padding: "54px 20px",
       textAlign: "center",
     }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>🏆</div>
+      <AppIcon name="trophy" size={48} color="#f7c75d" strokeWidth={1.5} />
       <div style={{ color: "#edf6ff", fontSize: 18, fontWeight: 800 }}>Nessuna partita ancora</div>
     </div>
   )
@@ -168,7 +169,7 @@ export default function Classifica() {
         gap: 10,
       }}>
         {podium.map((player, index) => {
-          const medals = ["🥇", "🥈", "🥉"]
+          const medals = ["medal", "medal", "medal"]
           const colors = ["#f7c75d", "#d1d5db", "#d39a67"]
 
           return (
@@ -179,7 +180,7 @@ export default function Classifica() {
               padding: "12px 10px",
               textAlign: "center",
             }}>
-              <div style={{ color: colors[index], fontSize: 24 }}>{medals[index]}</div>
+              <AppIcon name={medals[index]} size={24} color={colors[index]} strokeWidth={1.8} />
               <div style={{ color: "#edf6ff", fontSize: 12, fontWeight: 800, marginTop: 2 }}>{player.name}</div>
               <div style={{ color: "#9bb2c6", fontSize: 11, marginTop: 4 }}>{player.pts} pts</div>
             </div>
@@ -213,11 +214,11 @@ export default function Classifica() {
           <span style={{ textAlign: "center" }}>P</span>
           <span style={{ textAlign: "center" }}>S</span>
           <span style={{ textAlign: "center" }}>Pt</span>
-          <span style={{ textAlign: "center" }}>⭐</span>
+          <span style={{ textAlign: "center" }}><AppIcon name="star" size={13} color="#f7c75d" /></span>
         </div>
 
         {standings.map((p, i) => {
-          const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null
+          const medalColor = i === 0 ? "#f7c75d" : i === 1 ? "#d1d5db" : i === 2 ? "#d39a67" : null
           const votoColor = p.votoMedio >= 8 ? "#f7c75d" : p.votoMedio >= 6.5 ? "#71f0b0" : p.votoMedio >= 5 ? "#edf6ff" : "#8fa6ba"
           const isLeader = i === 0
 
@@ -231,8 +232,8 @@ export default function Classifica() {
               borderTop: "1px solid rgba(148, 163, 184, 0.12)",
               background: isLeader ? "rgba(113, 240, 176, 0.06)" : "transparent",
             }}>
-              <span style={{ color: medal ? "#f7c75d" : "#8fa6ba", fontSize: 13, fontWeight: 800 }}>
-                {medal || i + 1}
+              <span style={{ color: medalColor || "#8fa6ba", fontSize: 13, fontWeight: 800, display: "flex", justifyContent: "center" }}>
+                {medalColor ? <AppIcon name="medal" size={16} color={medalColor} strokeWidth={1.8} /> : i + 1}
               </span>
 
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

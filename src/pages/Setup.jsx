@@ -2,6 +2,7 @@ import { useState, useCallback } from "react"
 import { supabase } from "../supabaseClient"
 import { useAuth } from "../authContext"
 import Cropper from "react-easy-crop"
+import AppIcon from "../components/AppIcon"
 
 const C = {
   bg: "#07131b",
@@ -166,7 +167,7 @@ export default function Setup({ onComplete }) {
     }}>
       <div style={{ width: "100%", maxWidth: 360 }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ fontSize: 48, marginBottom: 8 }}>👋</div>
+          <AppIcon name="user" size={48} color={C.accent} strokeWidth={1.5} />
           <div style={{ color: C.text, fontSize: 22, fontWeight: 900, marginBottom: 4 }}>Benvenuto!</div>
           <div style={{ color: C.muted, fontSize: 14 }}>Come vuoi essere chiamato?</div>
         </div>
@@ -187,7 +188,7 @@ export default function Setup({ onComplete }) {
               }}>
                 {preview
                   ? <img src={preview} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  : <span style={{ fontSize: 32 }}>📷</span>
+                  : <AppIcon name="camera" size={32} color={C.accent} strokeWidth={1.6} />
                 }
               </div>
               <div style={{ color: C.accent, fontSize: 13, fontWeight: 600 }}>
@@ -224,7 +225,7 @@ export default function Setup({ onComplete }) {
             fontWeight: 900, fontSize: 15,
             cursor: name.trim() ? "pointer" : "not-allowed",
           }}>
-            {saving ? "Salvataggio..." : "INIZIA →"}
+            {saving ? "Salvataggio..." : <>INIZIA <AppIcon name="right" size={16} /></>}
           </button>
         </div>
       </div>

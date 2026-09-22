@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 import { formatMatchDate } from "../matchDate"
+import AppIcon from "../components/AppIcon"
 
 const C = {
   card: "#1a1a24", border: "#2a2a3a", accent: "#00e676",
@@ -114,7 +115,7 @@ export default function Storico() {
 
   if (matches.length === 0) return (
     <div style={{ textAlign: "center", padding: 60 }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>📅</div>
+      <AppIcon name="calendar" size={48} color={C.accent} strokeWidth={1.5} />
       <div style={{ color: C.text, fontSize: 18, fontWeight: 700 }}>Nessuna partita ancora</div>
     </div>
   )
@@ -181,7 +182,7 @@ export default function Storico() {
                 <span style={{ color: C.text, fontSize: 13, flex: 1, textAlign: "right" }}>{match.team_b_name}</span>
               </div>
               <div style={{ textAlign: "center", marginTop: 8 }}>
-                <span style={{ color: C.muted, fontSize: 11 }}>{isExpanded ? "▲ chiudi" : "▼ dettagli"}</span>
+                <span style={{ color: C.muted, fontSize: 11, display: "inline-flex", alignItems: "center", gap: 4 }}>{isExpanded ? <><AppIcon name="up" size={13} /> chiudi</> : <><AppIcon name="down" size={13} /> dettagli</>}</span>
               </div>
             </div>
 
@@ -231,7 +232,7 @@ export default function Storico() {
                           background: C.card, border: `1px solid ${C.border}`,
                           borderRadius: 6, padding: "4px 10px", fontSize: 12, color: C.text
                         }}>
-                          ⚽ {g.count > 1 ? `×${g.count} ` : ""}{g.players.name}
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="goals" size={13} /> {g.count > 1 ? `×${g.count} ` : ""}{g.players.name}</span>
                         </span>
                       ))}
                     </div>

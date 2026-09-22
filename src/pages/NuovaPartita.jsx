@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient"
 import { useAuth } from "../authContext"
 import { getTodayDateInput } from "../matchDate"
 import { buildBalancedTeams } from "../teamBalance"
+import AppIcon from "../components/AppIcon"
 
 const C = {
   bg: "#07131b",
@@ -274,7 +275,7 @@ export default function NuovaPartita() {
 
   if (success) return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, paddingTop: 60, textAlign: "center" }}>
-      <div style={{ fontSize: 56 }}>✅</div>
+      <AppIcon name="success" size={56} color={C.accent} strokeWidth={1.5} />
       <div style={{ color: C.text, fontSize: 22, fontWeight: 900 }}>Partita salvata!</div>
       <button onClick={() => setSuccess(false)} style={{
         background: C.accent,
@@ -537,7 +538,7 @@ export default function NuovaPartita() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                   <span style={{ color, fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>{name}</span>
                   <span style={{ fontSize: 12, color: total === score ? C.accent : total > score ? C.red : C.muted }}>
-                    {total}/{score} gol {total === score ? "✓" : total > score ? "⚠" : ""}
+                    {total}/{score} gol {total === score ? <AppIcon name="check" size={13} /> : total > score ? <AppIcon name="alert" size={13} /> : null}
                   </span>
                 </div>
                 {team.map(p => (
@@ -578,7 +579,7 @@ export default function NuovaPartita() {
                         minWidth: 64,
                       }}>
                       {Array.from({ length: score + 1 }, (_, i) => (
-                        <option key={i} value={i}>{i === 0 ? "–" : `⚽ ${i}`}</option>
+                        <option key={i} value={i}>{i === 0 ? "–" : `Gol ${i}`}</option>
                       ))}
                     </select>
                   </div>

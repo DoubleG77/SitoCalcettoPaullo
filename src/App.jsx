@@ -10,15 +10,16 @@ import Profilo from "./pages/Profilo"
 import NuovaPartita from "./pages/NuovaPartita"
 import Setup from "./pages/Setup"
 import { useSignedUrl } from "./hooks/useSignedUrl"
+import AppIcon from "./components/AppIcon"
 
 const NAV = [
-  { id: "home", label: "Home", icon: "⚽" },
-  { id: "classifica", label: "Classifica", icon: "🏆" },
-  { id: "marcatori", label: "Marcatori", icon: "👟" },
-  { id: "storico", label: "Storico", icon: "📅" },
-  { id: "pagelle", label: "Pagelle", icon: "🗳️" },
-  { id: "profilo", label: "Profilo", icon: "👤" },
-  { id: "nuova", label: "Nuova", icon: "➕" },
+  { id: "home", label: "Home", icon: "goals" },
+  { id: "classifica", label: "Classifica", icon: "trophy" },
+  { id: "marcatori", label: "Marcatori", icon: "boots" },
+  { id: "storico", label: "Storico", icon: "calendar" },
+  { id: "pagelle", label: "Pagelle", icon: "ratings" },
+  { id: "profilo", label: "Profilo", icon: "user" },
+  { id: "nuova", label: "Nuova", icon: "plus" },
 ]
 
 function HeaderAvatar({ player, onClick }) {
@@ -46,7 +47,7 @@ export default function App() {
 
   if (loading) return (
     <div style={{ background: "linear-gradient(180deg, #07121b 0%, #0d1b29 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: "#71f0b0", fontSize: 32 }}>⚽</div>
+      <AppIcon name="goals" size={34} color="#71f0b0" strokeWidth={1.8} title="Caricamento" />
     </div>
   )
 
@@ -90,7 +91,7 @@ export default function App() {
         <div>
           <div style={{ color: "#71f0b0", fontSize: 10, letterSpacing: 3, fontWeight: 800, marginBottom: 3 }}>IL CALCETTO</div>
           <div style={{ color: "#edf6ff", fontSize: 18, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
-            <span>{current?.icon}</span>
+            <AppIcon name={current?.icon} size={18} color="#71f0b0" strokeWidth={2.2} />
             <span>{current?.label}</span>
           </div>
         </div>
@@ -178,7 +179,7 @@ export default function App() {
             borderTop: page === item.id ? "2px solid #71f0b0" : "2px solid transparent",
             transition: "all 0.2s ease",
           }}>
-            <span style={{ fontSize: 15 }}>{item.icon}</span>
+            <AppIcon name={item.icon} size={16} color={page === item.id ? "#71f0b0" : "#7f93a7"} strokeWidth={2.1} />
             <span style={{ fontSize: 9, fontWeight: 700, color: page === item.id ? "#71f0b0" : "#7f93a7" }}>
               {item.label}
             </span>

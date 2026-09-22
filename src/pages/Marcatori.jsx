@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
+import AppIcon from "../components/AppIcon"
 
 const C = {
   card: "#12263a",
@@ -62,7 +63,7 @@ export default function Marcatori() {
 
   if (scorers.length === 0) return (
     <div style={{ textAlign: "center", padding: 60 }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>👟</div>
+      <AppIcon name="boots" size={48} color={C.accent} strokeWidth={1.5} />
       <div style={{ color: C.text, fontSize: 18, fontWeight: 700 }}>Nessun gol ancora</div>
     </div>
   )
@@ -81,7 +82,7 @@ export default function Marcatori() {
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
             <span style={{ color: C.muted, fontSize: 13, width: 20, textAlign: "center", fontWeight: 700 }}>
-              {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+              {i < 3 ? <AppIcon name="medal" size={16} color={[C.gold, "#d1d5db", "#d39a67"][i]} strokeWidth={1.8} /> : i + 1}
             </span>
             <span style={{ color: C.text, fontWeight: 700, flex: 1, fontSize: 15 }}>{p.name}</span>
             <span style={{ color: i === 0 ? C.gold : C.accent, fontWeight: 900, fontSize: 22 }}>{p.goals}</span>

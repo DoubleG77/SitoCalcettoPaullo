@@ -4,6 +4,7 @@ import { useAuth } from "../authContext"
 import { useSignedUrl } from "../hooks/useSignedUrl"
 import Cropper from "react-easy-crop"
 import { formatMatchDate } from "../matchDate"
+import AppIcon from "../components/AppIcon"
 
 async function getCroppedImg(imageSrc, croppedAreaPixels) {
   const image = await new Promise((resolve, reject) => {
@@ -286,7 +287,7 @@ export default function Profilo() {
       <button onClick={() => setShowOthers(false)} style={{
         background: "transparent", border: "none", color: C.muted,
         fontSize: 13, cursor: "pointer", textAlign: "left", padding: 0,
-      }}>← Il mio profilo</button>
+      }}><AppIcon name="left" size={14} /> Il mio profilo</button>
 
       <div style={{ color: C.muted, fontSize: 11, letterSpacing: 2 }}>TUTTI I GIOCATORI</div>
 
@@ -299,7 +300,7 @@ export default function Profilo() {
         }}>
           <Avatar player={p} size={44} />
           <span style={{ color: C.text, fontWeight: 600, fontSize: 15 }}>{p.name}</span>
-          <span style={{ color: C.muted, marginLeft: "auto" }}>→</span>
+          <AppIcon name="right" size={16} color={C.muted} />
         </button>
       ))}
     </div>
@@ -312,7 +313,7 @@ export default function Profilo() {
         <button onClick={() => loadProfile(currentPlayer)} style={{
           background: "transparent", border: "none", color: C.muted,
           fontSize: 13, cursor: "pointer", textAlign: "left", padding: 0,
-        }}>← Il mio profilo</button>
+        }}><AppIcon name="left" size={14} /> Il mio profilo</button>
       )}
 
       {loading ? (
@@ -330,7 +331,7 @@ export default function Profilo() {
                     background: C.accent, border: `2px solid ${C.card}`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     cursor: "pointer", fontSize: 13,
-                  }}>📷</label>
+                  }}><AppIcon name="camera" size={14} color={C.card} /></label>
                   <input id="avatar-change" type="file" accept="image/*"
                     onChange={handlePhotoSelect} style={{ display: "none" }} />
                 </>
@@ -377,7 +378,7 @@ export default function Profilo() {
                       background: "transparent", border: "none", color: C.muted,
                       cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 4,
                     }}
-                  >✎</button>
+                  ><AppIcon name="edit" size={16} color={C.muted} /></button>
                 )}
               </div>
             )}
@@ -389,13 +390,13 @@ export default function Profilo() {
           {stats && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {[
-                { label: "Gol totali", val: stats.goals, icon: "⚽" },
-                { label: "Partite", val: stats.played, icon: "📅" },
-                { label: "Vittorie", val: stats.w, icon: "✅" },
-                { label: "Pagella media", val: stats.votoMedio ?? "—", icon: "⭐" },
+                { label: "Gol totali", val: stats.goals, icon: "goals" },
+                { label: "Partite", val: stats.played, icon: "calendar" },
+                { label: "Vittorie", val: stats.w, icon: "success" },
+                { label: "Pagella media", val: stats.votoMedio ?? "—", icon: "star" },
               ].map(s => (
                 <Card key={s.label} style={{ textAlign: "center", padding: 16 }}>
-                  <div style={{ fontSize: 24, marginBottom: 4 }}>{s.icon}</div>
+                  <AppIcon name={s.icon} size={24} color={C.accent} strokeWidth={1.8} />
                   <div style={{ color: C.accent, fontSize: 22, fontWeight: 900 }}>{s.val}</div>
                   <div style={{ color: C.muted, fontSize: 11, marginTop: 2 }}>{s.label}</div>
                 </Card>
@@ -426,7 +427,7 @@ export default function Profilo() {
                     {m.scoreFor}–{m.scoreAgainst}
                   </span>
                   {m.goals > 0 && (
-                    <span style={{ color: C.accent, fontSize: 12, flexShrink: 0 }}>⚽ {m.goals}</span>
+                    <span style={{ color: C.accent, fontSize: 12, flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 3 }}><AppIcon name="goals" size={13} /> {m.goals}</span>
                   )}
                 </div>
               ))}

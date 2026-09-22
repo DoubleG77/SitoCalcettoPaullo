@@ -2,6 +2,7 @@ import { supabase } from "../supabaseClient"
 import { useAuth } from "../authContext"
 import { useState, useEffect, useRef } from "react"
 import { formatMatchDate } from "../matchDate"
+import AppIcon from "../components/AppIcon"
 
 const C = {
   card: "#1a1a24", border: "#2a2a3a", accent: "#00e676",
@@ -353,7 +354,7 @@ export default function Pagelle() {
 
   if (!lastMatch) return (
     <div style={{ textAlign: "center", padding: 60 }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>🗳️</div>
+      <AppIcon name="ratings" size={48} color={C.accent} strokeWidth={1.5} />
       <div style={{ color: C.text, fontSize: 18, fontWeight: 700 }}>Nessuna partita ancora</div>
     </div>
   )
@@ -379,7 +380,7 @@ export default function Pagelle() {
         </div>
         {isExpired
           ? <Badge color={C.red}>Scaduto</Badge>
-          : <Badge color={C.accent}>⏱ {countdown}</Badge>
+          : <Badge color={C.accent}><AppIcon name="calendar" size={12} /> {countdown}</Badge>
         }
       </div>
     </Card>
@@ -389,7 +390,7 @@ export default function Pagelle() {
   if (phase === "intro") return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <Card glow style={{ textAlign: "center", padding: 32 }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>🗳️</div>
+        <AppIcon name="ratings" size={48} color={C.accent} strokeWidth={1.5} />
         <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>
           Pagelle · {date}
         </div>
@@ -407,19 +408,19 @@ export default function Pagelle() {
             background: C.accent + "15", border: `1px solid ${C.accent}40`,
             borderRadius: 10, padding: "12px 20px", marginBottom: 16,
             color: C.accent, fontWeight: 700, fontSize: 14,
-          }}>✅ Hai già votato per questa partita</div>
+          }}><AppIcon name="success" size={16} /> Hai già votato per questa partita</div>
         ) : isExpired ? (
           <div style={{
             background: C.red + "15", border: `1px solid ${C.red}40`,
             borderRadius: 10, padding: "12px 20px", marginBottom: 16,
             color: C.red, fontWeight: 700, fontSize: 14,
-          }}>⏱ Votazione scaduta</div>
+          }}><AppIcon name="alert" size={16} /> Votazione scaduta</div>
         ) : (
           <button onClick={() => setPhase("rankA")} style={{
             background: C.accent, color: C.card, border: "none",
             borderRadius: 10, padding: "14px 40px", fontWeight: 900,
             fontSize: 15, cursor: "pointer",
-          }}>VOTA ORA →</button>
+          }}>VOTA ORA <AppIcon name="right" size={16} /></button>
         )}
       </Card>
 
@@ -480,7 +481,7 @@ export default function Pagelle() {
                     fontWeight: 900,
                   }}>{voter.name[0]?.toUpperCase()}</span>
                   <span style={{ flex: 1, fontWeight: 700 }}>{voter.name}</span>
-                  <span style={{ color: C.muted, fontSize: 16 }}>{isExpanded ? "▲" : "▼"}</span>
+                  <span style={{ color: C.muted, fontSize: 16 }}>{isExpanded ? <AppIcon name="up" size={16} /> : <AppIcon name="down" size={16} />}</span>
                 </button>
 
                 {isExpanded && (
@@ -537,12 +538,12 @@ export default function Pagelle() {
       <button onClick={() => setPhase("rankB")} style={{
         background: C.accent, color: C.card, border: "none",
         borderRadius: 10, padding: "14px", fontWeight: 900, fontSize: 15, cursor: "pointer",
-      }}>AVANTI → {lastMatch.team_b_name}</button>
+      }}>AVANTI <AppIcon name="right" size={16} /> {lastMatch.team_b_name}</button>
       <button onClick={() => setPhase("intro")} style={{
         background: "transparent", color: C.muted,
         border: `1px solid ${C.border}`, borderRadius: 8,
         padding: "10px", fontSize: 12, cursor: "pointer",
-      }}>✕ Annulla votazione</button>
+      }}><AppIcon name="close" size={14} /> Annulla votazione</button>
     </div>
   )
 
@@ -568,7 +569,7 @@ export default function Pagelle() {
         background: C.accent, color: C.card, border: "none",
         borderRadius: 10, padding: "14px", fontWeight: 900,
         fontSize: 15, cursor: "pointer", opacity: saving ? 0.6 : 1,
-      }}>{saving ? "SALVATAGGIO..." : "SALVA PAGELLE ✓"}</button>
+      }}>{saving ? "SALVATAGGIO..." : <>SALVA PAGELLE <AppIcon name="check" size={16} /></>}</button>
       {saveError && (
         <div role="alert" style={{
           background: C.red + "15", border: `1px solid ${C.red}40`,
@@ -580,12 +581,12 @@ export default function Pagelle() {
         background: "transparent", color: C.muted,
         border: `1px solid ${C.border}`, borderRadius: 8,
         padding: "8px", fontSize: 12, cursor: "pointer",
-      }}>← Torna a {lastMatch.team_a_name}</button>
+      }}><AppIcon name="left" size={14} /> Torna a {lastMatch.team_a_name}</button>
       <button onClick={() => { setPhase("intro"); setRankingA(playersA); setRankingB(playersB) }} style={{
         background: "transparent", color: C.red + "90",
         border: `1px solid ${C.red}30`, borderRadius: 8,
         padding: "10px", fontSize: 12, cursor: "pointer",
-      }}>✕ Annulla votazione</button>
+      }}><AppIcon name="close" size={14} /> Annulla votazione</button>
     </div>
   )
 
@@ -595,7 +596,7 @@ export default function Pagelle() {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <Card glow style={{ textAlign: "center", padding: 28 }}>
-          <div style={{ fontSize: 52, marginBottom: 8 }}>🏆</div>
+          <AppIcon name="trophy" size={52} color={C.gold} strokeWidth={1.5} />
           <div style={{ color: C.gold, fontSize: 26, fontWeight: 900 }}>{mvp?.name}</div>
           <div style={{ color: C.text, fontSize: 14, marginTop: 4 }}>MVP della partita · {date}</div>
         </Card>
@@ -613,7 +614,7 @@ export default function Pagelle() {
               boxShadow: i === 0 ? `0 0 20px ${C.gold}10` : "none",
             }}>
               <span style={{ color: C.muted, width: 24, fontSize: 14 }}>
-                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                {i < 3 ? <AppIcon name="medal" size={16} color={[C.gold, "#d1d5db", "#d39a67"][i]} strokeWidth={1.8} /> : i + 1}
               </span>
               <div style={{ flex: 1 }}>
                 <div style={{ color: C.text, fontWeight: 600, fontSize: 15 }}>{r.name}</div>
@@ -636,7 +637,7 @@ export default function Pagelle() {
           background: "transparent", color: C.muted,
           border: `1px solid ${C.border}`, borderRadius: 8,
           padding: "10px", fontSize: 12, cursor: "pointer",
-        }}>← Torna alla intro</button>
+        }}><AppIcon name="left" size={14} /> Torna alla intro</button>
       </div>
     )
   }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 import { formatMatchDate } from "../matchDate"
+import AppIcon from "../components/AppIcon"
 
 const C = {
   bg: "#07131b",
@@ -139,7 +140,7 @@ export default function Home({ onNavigate }) {
 
   if (!match) return (
     <div style={{ textAlign: "center", padding: 60 }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>⚽</div>
+      <AppIcon name="goals" size={48} color={C.accent} strokeWidth={1.5} />
       <div style={{ color: C.text, fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Nessuna partita ancora</div>
       <div style={{ color: C.muted, fontSize: 14 }}>Inserisci la prima partita per iniziare!</div>
     </div>
@@ -219,7 +220,7 @@ export default function Home({ onNavigate }) {
                 ? <div style={{ color: C.muted, fontSize: 12 }}>—</div>
                 : scorersA.map(s => (
                   <div key={s.players.name} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                    <span style={{ color: C.accent, fontSize: 12 }}>⚽ ×{s.count}</span>
+                    <span style={{ color: C.accent, fontSize: 12, display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="goals" size={13} /> ×{s.count}</span>
                     <span style={{ color: C.text, fontSize: 13 }}>{s.players.name}</span>
                   </div>
                 ))
@@ -232,7 +233,7 @@ export default function Home({ onNavigate }) {
                 : scorersB.map(s => (
                   <div key={s.players.name} style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, marginBottom: 4 }}>
                     <span style={{ color: C.text, fontSize: 13 }}>{s.players.name}</span>
-                    <span style={{ color: C.red, fontSize: 12 }}>⚽ ×{s.count}</span>
+                    <span style={{ color: C.red, fontSize: 12, display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="goals" size={13} /> ×{s.count}</span>
                   </div>
                 ))
               }
@@ -246,7 +247,7 @@ export default function Home({ onNavigate }) {
         {/* MVP ultima partita */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, textAlign: "center" }}>
           <div style={{ color: C.muted, fontSize: 10, letterSpacing: 1, marginBottom: 8 }}>MVP ULTIMA PARTITA</div>
-          <div style={{ fontSize: 32, marginBottom: 4 }}>👑</div>
+          <AppIcon name="crown" size={32} color={C.gold} strokeWidth={1.7} />
           {mvpName ? (
             <>
               <div style={{ color: C.gold, fontSize: 18, fontWeight: 900 }}>{mvpName}</div>
@@ -278,7 +279,7 @@ export default function Home({ onNavigate }) {
         background: `linear-gradient(135deg, ${C.accent}12, ${C.accent}05)`,
         border: `1px solid ${C.accent}30`, textAlign: "center"
       }}>
-        <div style={{ fontSize: 24, marginBottom: 6 }}>🗳️</div>
+        <AppIcon name="ratings" size={24} color={C.accent} strokeWidth={1.8} />
         <div style={{ color: C.text, fontWeight: 700, marginBottom: 4 }}>Vota le pagelle!</div>
         <div style={{ color: C.muted, fontSize: 12, marginBottom: 14 }}>Hai 24 ore per votare</div>
         <button
@@ -287,7 +288,7 @@ export default function Home({ onNavigate }) {
             background: C.accent, color: C.bg, border: "none",
             borderRadius: 8, padding: "10px 24px", fontWeight: 900,
             fontSize: 13, cursor: "pointer",
-          }}>VOTA ORA →</button>
+          }}>VOTA ORA <AppIcon name="right" size={16} /></button>
       </Card>
 
     </div>
