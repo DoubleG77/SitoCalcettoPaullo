@@ -167,7 +167,7 @@ export default function Storico() {
                 <Badge color={resultColor}>{resultLabel}</Badge>
               </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ color: C.text, fontSize: 13, flex: 1 }}>{match.team_a_name}</span>
+                <span style={{ color: C.text, fontSize: 13, flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>{match.team_a_name}</span>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 12px" }}>
                   <span style={{
                     fontSize: 26, fontWeight: 900,
@@ -179,7 +179,7 @@ export default function Storico() {
                     color: match.score_b > match.score_a ? C.accent : C.text
                   }}>{match.score_b}</span>
                 </div>
-                <span style={{ color: C.text, fontSize: 13, flex: 1, textAlign: "right" }}>{match.team_b_name}</span>
+                <span style={{ color: C.text, fontSize: 13, flex: 1, minWidth: 0, overflowWrap: "anywhere", textAlign: "right" }}>{match.team_b_name}</span>
               </div>
               <div style={{ textAlign: "center", marginTop: 8 }}>
                 <span style={{ color: C.muted, fontSize: 11, display: "inline-flex", alignItems: "center", gap: 4 }}>{isExpanded ? <><AppIcon name="up" size={13} /> chiudi</> : <><AppIcon name="down" size={13} /> dettagli</>}</span>

@@ -25,6 +25,22 @@
   box-sizing: border-box;
 }
 
+img,
+svg {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+button {
+  overflow-wrap: anywhere;
+}
+
 html {
   background: linear-gradient(180deg, #07121b 0%, #0d1b29 100%);
 }
@@ -46,4 +62,35 @@ select {
 select option {
   background-color: #12263a;
   color: var(--text-primary);
+}
+
+@media (max-width: 380px) {
+  .app-header {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .app-header > div:first-child {
+    min-width: 0;
+  }
+
+  .app-header > div:first-child > div:last-child {
+    min-width: 0;
+  }
+
+  .app-header > div:first-child > div:last-child span {
+    overflow-wrap: anywhere;
+  }
+
+  .app-nav button {
+    min-width: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .app-nav button span:last-child {
+    max-width: 100%;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
 }

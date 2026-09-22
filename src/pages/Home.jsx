@@ -287,7 +287,9 @@ export default function Home({ onNavigate }) {
           style={{
             background: C.accent, color: C.bg, border: "none",
             borderRadius: 8, padding: "10px 24px", fontWeight: 900,
-            fontSize: 13, cursor: "pointer",
+            fontSize: 13, cursor: "pointer", display: "inline-flex",
+            alignItems: "center", justifyContent: "center", gap: 6,
+            whiteSpace: "nowrap", maxWidth: "100%",
           }}>VOTA ORA <AppIcon name="right" size={16} /></button>
       </Card>
 

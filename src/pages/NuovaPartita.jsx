@@ -437,6 +437,7 @@ export default function NuovaPartita() {
               borderRadius: 14,
               padding: 12,
               border: `1px solid ${color}30`,
+              minWidth: 0,
             }}>
               <input value={name} onChange={e => setName(e.target.value)}
                 placeholder={`Nome squadra ${label}`}
@@ -458,7 +459,7 @@ export default function NuovaPartita() {
               {team.length === 0
                 ? <div style={{ color: C.muted, fontSize: 12, fontStyle: "italic" }}>Nessuno</div>
                 : team.map(p => (
-                  <div key={p.id} style={{ color: C.text, fontSize: 13, padding: "2px 0" }}>· {p.name}</div>
+                  <div key={p.id} style={{ color: C.text, fontSize: 13, padding: "2px 0", overflowWrap: "anywhere" }}>· {p.name}</div>
                 ))
               }
             </div>
@@ -497,7 +498,7 @@ export default function NuovaPartita() {
             { name: nameB || "Squadra B", val: scoreB, set: setScoreB, color: C.red },
           ].map(({ name, val, set, color }, i) => (
             <div key={i} style={{ textAlign: "center", flex: 1 }}>
-              <div style={{ color, fontSize: 11, fontWeight: 800, letterSpacing: 1, marginBottom: 8 }}>{name}</div>
+              <div style={{ color, fontSize: 11, fontWeight: 800, letterSpacing: 1, marginBottom: 8, overflowWrap: "anywhere" }}>{name}</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                 <button onClick={() => set(Math.max(0, val - 1))} style={{
                   width: 34,
@@ -563,7 +564,7 @@ export default function NuovaPartita() {
                       fontSize: 12,
                       fontWeight: 900,
                     }}>{p.name[0]}</div>
-                    <span style={{ color: C.text, fontSize: 14, flex: 1 }}>{p.name}</span>
+                    <span style={{ color: C.text, fontSize: 14, flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>{p.name}</span>
                     <select
                       value={goals[p.id] || 0}
                       onChange={e => setGoals(g => ({ ...g, [p.id]: parseInt(e.target.value) }))}

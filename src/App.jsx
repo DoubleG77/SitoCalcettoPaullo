@@ -161,7 +161,7 @@ export default function App() {
         borderTop: "1px solid rgba(148, 163, 184, 0.12)",
         backdropFilter: "blur(12px)",
         display: "grid",
-        gridTemplateColumns: "repeat(7, 1fr)",
+        gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
         zIndex: 20,
       }}>
         <div className="app-nav-inner">
@@ -174,6 +174,7 @@ export default function App() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            minWidth: 0,
             gap: 5,
             cursor: "pointer",
             borderTop: page === item.id ? "2px solid #71f0b0" : "2px solid transparent",

@@ -144,7 +144,7 @@ export default function Classifica() {
           <div style={{ color: "#9bb2c6", fontSize: 10, letterSpacing: 2.5, fontWeight: 700 }}>STAGIONE 2026/27</div>
           <div style={{ color: "#edf6ff", fontSize: 26, fontWeight: 900, marginTop: 4 }}>Classifica</div>
         </div>
-        <div style={{
+        <div className="standings-table" style={{
           background: "rgba(113, 240, 176, 0.08)",
           border: "1px solid rgba(113, 240, 176, 0.2)",
           color: "#71f0b0",
@@ -223,7 +223,7 @@ export default function Classifica() {
           const isLeader = i === 0
 
           return (
-            <div key={p.name} style={{
+            <div key={p.name} className="standings-table-row" style={{
               display: "grid",
               gridTemplateColumns: "28px 1fr 36px 36px 36px 36px 42px 48px",
               gap: 4,
@@ -236,7 +236,7 @@ export default function Classifica() {
                 {medalColor ? <AppIcon name="medal" size={16} color={medalColor} strokeWidth={1.8} /> : i + 1}
               </span>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                 <span style={{
                   width: 8,
                   height: 8,
@@ -244,7 +244,7 @@ export default function Classifica() {
                   background: isLeader ? "#71f0b0" : "rgba(148, 163, 184, 0.5)",
                   display: "inline-block",
                 }} />
-                <span style={{ color: "#edf6ff", fontWeight: 700, fontSize: 13 }}>{p.name}</span>
+                <span style={{ color: "#edf6ff", fontWeight: 700, fontSize: 13, minWidth: 0, overflowWrap: "anywhere" }}>{p.name}</span>
               </div>
 
               <span style={{ color: "#9bb2c6", fontSize: 12, textAlign: "center" }}>{p.played}</span>
