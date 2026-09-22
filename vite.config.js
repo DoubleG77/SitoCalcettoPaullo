@@ -4,11 +4,17 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    watch: {
+      usePolling: true,
+      interval: 1000,
+    },
+  },
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['pwa.svg'],
+      includeAssets: ['logo-square.jpg'],
       manifest: {
         name: 'Calcetto Paullo',
         short_name: 'Calcetto',
@@ -21,15 +27,15 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/pwa.svg',
+            src: '/logo-square.jpg',
             sizes: '192x192',
-            type: 'image/svg+xml',
+            type: 'image/jpeg',
             purpose: 'any maskable',
           },
           {
-            src: '/pwa.svg',
+            src: '/logo-square.jpg',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/jpeg',
             purpose: 'any maskable',
           },
         ],

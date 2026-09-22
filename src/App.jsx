@@ -89,7 +89,10 @@ export default function App() {
         alignItems: "center",
       }}>
         <div>
-          <div style={{ color: "#71f0b0", fontSize: 10, letterSpacing: 3, fontWeight: 800, marginBottom: 3 }}>IL CALCETTO</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+            <img src="/logo-square.jpg" alt="Logo Calcetto Paullo" style={{ width: 28, height: 28, objectFit: "cover", borderRadius: 7 }} />
+            <div style={{ color: "#71f0b0", fontSize: 10, letterSpacing: 3, fontWeight: 800 }}>IL CALCETTO</div>
+          </div>
           <div style={{ color: "#edf6ff", fontSize: 18, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
             <AppIcon name={current?.icon} size={18} color="#71f0b0" strokeWidth={2.2} />
             <span>{current?.label}</span>
