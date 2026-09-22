@@ -4,6 +4,7 @@ import { useAuth } from "../authContext"
 import { getTodayDateInput } from "../matchDate"
 import { buildBalancedTeams } from "../teamBalance"
 import AppIcon from "../components/AppIcon"
+import { notifyMatchAdded, requestNotificationPermission } from "../notifications"
 
 const C = {
   bg: "#07131b",
@@ -251,6 +252,11 @@ export default function NuovaPartita() {
         const { error: goalsError } = await supabase.from("goals").insert(goalRows)
         if (goalsError) throw goalsError
       }
+
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
+        await requestNotificationPermission()
+      }
+      notifyMatchAdded()
 
       setSuccess(true)
       setTeamA([]); setTeamB([]); setNameA(""); setNameB("")

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAuth } from "./authContext"
 import Login from "./pages/Login"
 import Home from "./pages/Home"
@@ -11,6 +11,7 @@ import NuovaPartita from "./pages/NuovaPartita"
 import Setup from "./pages/Setup"
 import { useSignedUrl } from "./hooks/useSignedUrl"
 import AppIcon from "./components/AppIcon"
+import { dismissStoredNotification, getStoredNotifications } from "./notifications"
 
 const NAV = [
   { id: "home", label: "Home", icon: "goals" },
@@ -43,7 +44,14 @@ function HeaderAvatar({ player, onClick }) {
 export default function App() {
   const [page, setPage] = useState("home")
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+  const [notifications, setNotifications] = useState([])
   const { user, player, loading, signOut, refreshPlayer } = useAuth()
+
+  useEffect(() => {
+    setNotifications(getStoredNotifications())
+  }, [page])
+
+  const latestNotification = notifications[0]
 
   if (loading) return (
     <div style={{ background: "linear-gradient(180deg, #07121b 0%, #0d1b29 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -76,6 +84,37 @@ export default function App() {
       flexDirection: "column",
       boxShadow: "0 0 0 1px rgba(148, 163, 184, 0.08)",
     }}>
+      {latestNotification && (
+        <div style={{
+          margin: "12px 16px 0",
+          background: "linear-gradient(135deg, rgba(113, 240, 176, 0.18), rgba(247, 199, 93, 0.14))",
+          border: "1px solid rgba(113, 240, 176, 0.35)",
+          borderRadius: 16,
+          padding: "12px 14px",
+          boxShadow: "0 10px 20px rgba(0,0,0,0.14)",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ color: "#71f0b0", fontSize: 10, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase" }}>Notifica</div>
+              <div style={{ color: "#edf6ff", fontSize: 15, fontWeight: 800, marginTop: 4 }}>{latestNotification.title}</div>
+              <div style={{ color: "#dceaf8", fontSize: 12, marginTop: 4 }}>{latestNotification.body}</div>
+            </div>
+            <button onClick={() => {
+              dismissStoredNotification(latestNotification.id)
+              setNotifications(getStoredNotifications())
+            }} style={{
+              background: "transparent",
+              border: "none",
+              color: "#dceaf8",
+              fontSize: 18,
+              cursor: "pointer",
+              padding: 0,
+              lineHeight: 1,
+            }} aria-label="Chiudi notifica">×</button>
+          </div>
+        </div>
+      )}
+
       <div className="app-header" style={{
         background: "rgba(10, 18, 25, 0.92)",
         borderBottom: "1px solid rgba(148, 163, 184, 0.12)",
