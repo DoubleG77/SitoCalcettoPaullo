@@ -5,6 +5,7 @@ import { getTodayDateInput } from "../matchDate"
 import { buildBalancedTeams } from "../teamBalance"
 import AppIcon from "../components/AppIcon"
 import { notifyMatchAdded, requestNotificationPermission } from "../notifications"
+import { sendMatchNotification } from "../pushNotifications"
 
 const C = {
   bg: "#07131b",
@@ -259,6 +260,7 @@ export default function NuovaPartita() {
       setMatchDate(getTodayDateInput())
 
       notifyMatchAdded()
+      await sendMatchNotification(match.id).catch(() => {})
       if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
         requestNotificationPermission().catch(() => {})
       }

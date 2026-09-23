@@ -1,6 +1,8 @@
 const STORAGE_KEY = "calcetto_notifications"
 const PERMISSION_PROMPT_KEY = "calcetto_notification_permission_prompted"
 
+import { registerPushSubscription } from "./pushNotifications"
+
 export function getStoredNotifications() {
   if (typeof window === "undefined") return []
 
@@ -75,15 +77,19 @@ export function notifyMatchAdded() {
   return entry
 }
 
-export async function requestNotificationPermission() {
+export async function requestNotificationPermission(userId) {
   if (typeof window === "undefined" || !("Notification" in window)) {
     return "unsupported"
   }
 
-  if (Notification.permission !== "default") {
-    return Notification.permission
+  if (Notification.permission === "default") {
+    window.localStorage.setItem(PERMISSION_PROMPT_KEY, "1")
+    await Notification.requestPermission()
   }
 
-  window.localStorage.setItem(PERMISSION_PROMPT_KEY, "1")
-  return Notification.requestPermission()
+  if (Notification.permission === "granted" && userId) {
+    await registerPushSubscription(userId)
+  }
+
+  return Notification.permission
 }

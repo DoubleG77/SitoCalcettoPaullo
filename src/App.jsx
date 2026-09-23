@@ -54,7 +54,9 @@ export default function App() {
 
   useEffect(() => {
     if (user && player && shouldAskForNotificationPermission()) {
-      requestNotificationPermission()
+      requestNotificationPermission(user.id).catch(() => {})
+    } else if (user && player && typeof Notification !== "undefined" && Notification.permission === "granted") {
+      requestNotificationPermission(user.id).catch(() => {})
     }
   }, [user, player])
 
