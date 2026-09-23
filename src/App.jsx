@@ -49,12 +49,8 @@ function HeaderAvatar({ player, onClick }) {
 export default function App() {
   const [page, setPage] = useState("home")
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
-  const [notifications, setNotifications] = useState([])
-  const { user, player, loading, signOut, refreshPlayer } = useAuth()
-
-  useEffect(() => {
-    setNotifications(getStoredNotifications())
-  }, [page])
+  const [notifications, setNotifications] = useState(getStoredNotifications)
+  const { user, player, loading, profileError, signOut, refreshPlayer } = useAuth()
 
   useEffect(() => {
     if (user && player && shouldAskForNotificationPermission()) {
@@ -71,6 +67,21 @@ export default function App() {
   )
 
   if (!user) return <Login />
+  if (profileError && !player) return (
+    <div style={{ background: "linear-gradient(180deg, #07121b 0%, #0d1b29 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ maxWidth: 420, color: "#edf6ff", textAlign: "center" }}>
+        <AppIcon name="user" size={42} color="#ff7c8b" strokeWidth={1.6} />
+        <h1 style={{ fontSize: 22, margin: "18px 0 10px" }}>Profilo non trovato</h1>
+        <p style={{ color: "#9bb2c6", lineHeight: 1.6, margin: 0 }}>{profileError}</p>
+        <p style={{ color: "#9bb2c6", fontSize: 13, lineHeight: 1.5, margin: "16px 0 0" }}>
+          Account Google: {user.email || "email non disponibile"}
+        </p>
+        <button onClick={signOut} style={{ marginTop: 22, background: "#71f0b0", color: "#07131b", border: "none", borderRadius: 10, padding: "12px 18px", fontWeight: 800, cursor: "pointer" }}>
+          Esci e cambia account
+        </button>
+      </div>
+    </div>
+  )
   if (!player) return <Setup onComplete={refreshPlayer} />
 
   const current = NAV.find(n => n.id === page)

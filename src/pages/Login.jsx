@@ -15,7 +15,7 @@ const C = {
 }
 
 export default function Login() {
-  const { signInWithGoogle } = useAuth()
+  const { authError, signInWithGoogle } = useAuth()
 
   return (
     <div style={{
@@ -202,6 +202,21 @@ export default function Login() {
               </svg>
               Continua con Google
             </button>
+
+            {authError && (
+              <div role="alert" style={{
+                marginTop: 14,
+                padding: "12px 14px",
+                borderRadius: 12,
+                border: "1px solid rgba(248, 113, 113, 0.4)",
+                background: "rgba(127, 29, 29, 0.25)",
+                color: "#fecaca",
+                fontSize: 13,
+                lineHeight: 1.5,
+              }}>
+                Accesso non riuscito: {authError}. Verifica la configurazione OAuth di Google e riprova.
+              </div>
+            )}
 
             <div style={{
               textAlign: "center",

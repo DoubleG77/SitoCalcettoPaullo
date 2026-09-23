@@ -6,19 +6,35 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [player, setPlayer] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [profileError, setProfileError] = useState(null)
+  const [authError, setAuthError] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    const callbackError = params.get("error_description") || params.get("error")
+    return callbackError ? callbackError.replace(/\+/g, " ") : null
+  })
 
   async function loadPlayer(userId) {
-    const { data } = await supabase
+    setProfileError(null)
+    const { data, error } = await supabase
       .from("players")
       .select("*")
       .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+      .limit(1)
       .maybeSingle()
+    if (error) {
+      setProfileError(`Impossibile caricare il profilo: ${error.message}`)
+      setLoading(false)
+      return null
+    }
     setPlayer(data || null)
     setLoading(false)
+    return data || null
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) setAuthError(error.message)
       setUser(session?.user ?? null)
       if (session?.user) queueMicrotask(() => loadPlayer(session.user.id))
       else setLoading(false)
@@ -34,10 +50,12 @@ export function AuthProvider({ children }) {
   }, [])
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
+    setAuthError(null)
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin }
     })
+    if (error) setAuthError(error.message)
   }
 
   const signOut = async () => {
@@ -46,11 +64,12 @@ export function AuthProvider({ children }) {
   }
 
   const refreshPlayer = async () => {
-    if (user) await loadPlayer(user.id)
+    if (user) return loadPlayer(user.id)
+    return null
   }
 
   return (
-    <AuthContext.Provider value={{ user, player, loading, signInWithGoogle, signOut, refreshPlayer }}>
+    <AuthContext.Provider value={{ user, player, loading, authError, profileError, signInWithGoogle, signOut, refreshPlayer }}>
       {children}
     </AuthContext.Provider>
   )

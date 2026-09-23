@@ -408,12 +408,14 @@ export default function Pagelle() {
             background: C.accent + "15", border: `1px solid ${C.accent}40`,
             borderRadius: 10, padding: "12px 20px", marginBottom: 16,
             color: C.accent, fontWeight: 700, fontSize: 14,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
           }}><AppIcon name="success" size={16} /> Hai già votato per questa partita</div>
         ) : isExpired ? (
           <div style={{
             background: C.red + "15", border: `1px solid ${C.red}40`,
             borderRadius: 10, padding: "12px 20px", marginBottom: 16,
             color: C.red, fontWeight: 700, fontSize: 14,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
           }}><AppIcon name="alert" size={16} /> Votazione scaduta</div>
         ) : (
           <button onClick={() => setPhase("rankA")} style={{

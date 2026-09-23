@@ -9,6 +9,7 @@ const C = {
   card: "#12263a",
   border: "rgba(148, 163, 184, 0.16)",
   accent: "#71f0b0",
+  red: "#ff7c8b",
   text: "#edf6ff",
   muted: "#9bb2c6",
   surface: "#0d1f2c",
@@ -51,6 +52,7 @@ export default function Setup({ onComplete }) {
   const [preview, setPreview] = useState(null)
   const [cropping, setCropping] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState("")
 
   const handlePhoto = (e) => {
     const file = e.target.files[0]
@@ -76,44 +78,44 @@ export default function Setup({ onComplete }) {
   const handleSave = async () => {
     if (!name.trim()) return
     setSaving(true)
+    setSaveError("")
 
-    let avatar_url = null
+    try {
+      let avatar_url = null
 
-    if (preview && croppedAreaPixels) {
-        try {
+      if (preview && croppedAreaPixels) {
         const blob = await getCroppedImg(imageSrc, croppedAreaPixels)
-        console.log("Blob creato:", blob.size, blob.type)
 
         const path = `${user.id}/avatar.jpg`
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
             .from("Avatars")
             .upload(path, blob, { upsert: true, contentType: "image/jpeg" })
 
-        console.log("Upload result:", uploadData, uploadError)
+        if (uploadError) throw uploadError
+        avatar_url = path
+      }
 
-        if (uploadError) {
-            console.error("Upload error:", uploadError)
-            alert("Errore upload: " + uploadError.message)
-        } else {
-            avatar_url = path
-            console.log("Avatar path:", avatar_url)
-        }
-        } catch (e) {
-        console.error("Errore crop/upload:", e)
-        }
+      const { data: insertData, error } = await supabase
+        .from("players")
+        .insert({
+          name: name.trim(),
+          user_id: user.id,
+          avatar_url,
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      console.log("Insert result:", insertData)
+      const loadedPlayer = await onComplete()
+      if (!loadedPlayer) throw new Error("Profilo creato, ma non è stato possibile ricaricarlo. Riprova.")
+    } catch (error) {
+      console.error("Errore salvataggio profilo:", error)
+      setSaveError(`Errore: ${error.message}`)
+    } finally {
+      setSaving(false)
     }
-
-    const { data: insertData, error } = await supabase.from("players").insert({
-        name: name.trim(),
-        user_id: user.id,
-        avatar_url,
-    })
-
-    console.log("Insert result:", insertData, error)
-
-    if (error) { alert("Errore: " + error.message); setSaving(false); return }
-    onComplete()
-    }
+  }
 
   // Schermata crop
   if (cropping) return (
@@ -167,7 +169,9 @@ export default function Setup({ onComplete }) {
     }}>
       <div style={{ width: "100%", maxWidth: 360 }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <AppIcon name="user" size={48} color={C.accent} strokeWidth={1.5} />
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+            <AppIcon name="user" size={48} color={C.accent} strokeWidth={1.5} />
+          </div>
           <div style={{ color: C.text, fontSize: 22, fontWeight: 900, marginBottom: 4 }}>Benvenuto!</div>
           <div style={{ color: C.muted, fontSize: 14 }}>Come vuoi essere chiamato?</div>
         </div>
@@ -224,9 +228,11 @@ export default function Setup({ onComplete }) {
             border: "none", borderRadius: 10, padding: "14px",
             fontWeight: 900, fontSize: 15,
             cursor: name.trim() ? "pointer" : "not-allowed",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
           }}>
             {saving ? "Salvataggio..." : <>INIZIA <AppIcon name="right" size={16} /></>}
           </button>
+          {saveError && <div style={{ color: C.red, fontSize: 13, lineHeight: 1.4 }}>{saveError}</div>}
         </div>
       </div>
     </div>
