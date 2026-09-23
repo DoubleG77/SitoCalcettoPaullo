@@ -23,6 +23,7 @@ const Badge = ({ children, color = C.accent }) => (
   <span style={{
     background: color + "20", color, border: `1px solid ${color}40`,
     borderRadius: 4, padding: "2px 8px", fontSize: 11, fontWeight: 700, letterSpacing: 1,
+    display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5,
   }}>{children}</span>
 )
 
@@ -390,7 +391,9 @@ export default function Pagelle() {
   if (phase === "intro") return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <Card glow style={{ textAlign: "center", padding: 32 }}>
-        <AppIcon name="ratings" size={48} color={C.accent} strokeWidth={1.5} />
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+          <AppIcon name="ratings" size={48} color={C.accent} strokeWidth={1.5} />
+        </div>
         <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>
           Pagelle · {date}
         </div>
@@ -422,6 +425,7 @@ export default function Pagelle() {
             background: C.accent, color: C.card, border: "none",
             borderRadius: 10, padding: "14px 40px", fontWeight: 900,
             fontSize: 15, cursor: "pointer",
+            display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7,
           }}>VOTA ORA <AppIcon name="right" size={16} /></button>
         )}
       </Card>
