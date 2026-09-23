@@ -253,19 +253,20 @@ export default function NuovaPartita() {
         if (goalsError) throw goalsError
       }
 
-      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
-        await requestNotificationPermission()
-      }
-      notifyMatchAdded()
-
       setSuccess(true)
       setTeamA([]); setTeamB([]); setNameA(""); setNameB("")
       setScoreA(0); setScoreB(0); setGoalsA({}); setGoalsB({})
       setMatchDate(getTodayDateInput())
+
+      notifyMatchAdded()
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
+        requestNotificationPermission().catch(() => {})
+      }
     } catch (e) {
       setSaveError(`Errore nel salvataggio: ${e.message}`)
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   const clearTeams = () => {
